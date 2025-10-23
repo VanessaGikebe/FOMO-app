@@ -22,6 +22,7 @@ const sampleUser = {
 export default function ProfilePage({ userData = sampleUser }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(userData);
+  const [newInterest, setNewInterest] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -29,6 +30,30 @@ export default function ProfilePage({ userData = sampleUser }) {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleAddInterest = () => {
+    if (newInterest.trim() && !formData.interests.includes(newInterest.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        interests: [...prev.interests, newInterest.trim()]
+      }));
+      setNewInterest("");
+    }
+  };
+
+  const handleRemoveInterest = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      interests: prev.interests.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddInterest();
+    }
   };
 
   const handleSave = () => {
@@ -40,6 +65,7 @@ export default function ProfilePage({ userData = sampleUser }) {
 
   const handleCancel = () => {
     setFormData(userData);
+    setNewInterest("");
     setIsEditing(false);
   };
 
@@ -69,7 +95,7 @@ export default function ProfilePage({ userData = sampleUser }) {
             {!isEditing && (
               <Button 
                 variant="outline" 
-                className="border-white text-white hover:bg-white hover:text-black"
+                className="border-white text-white hover:bg-gray-700 hover:text-black"
                 onClick={() => setIsEditing(true)}
               >
                 Edit Profile
@@ -106,79 +132,85 @@ export default function ProfilePage({ userData = sampleUser }) {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile Information</h2>
 
             <div className="space-y-6">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                ) : (
-                  <p className="text-gray-900">{formData.name}</p>
-                )}
+              {/* Two-column grid for Name and Email */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{formData.name}</p>
+                  )}
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{formData.email}</p>
+                  )}
+                </div>
               </div>
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                {isEditing ? (
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                ) : (
-                  <p className="text-gray-900">{formData.email}</p>
-                )}
+              {/* Two-column grid for Phone and Location */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{formData.phone}</p>
+                  )}
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location
+                  </label>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{formData.location}</p>
+                  )}
+                </div>
               </div>
 
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
-                </label>
-                {isEditing ? (
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                ) : (
-                  <p className="text-gray-900">{formData.phone}</p>
-                )}
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Location
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                  />
-                ) : (
-                  <p className="text-gray-900">{formData.location}</p>
-                )}
-              </div>
-
-              {/* Bio */}
+              {/* Bio - full width */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bio
@@ -189,25 +221,69 @@ export default function ProfilePage({ userData = sampleUser }) {
                     value={formData.bio}
                     onChange={handleInputChange}
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
                   />
                 ) : (
                   <p className="text-gray-900">{formData.bio}</p>
                 )}
               </div>
 
-              {/* Interests */}
+              {/* Interests - full width */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Interests
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {formData.interests.map((interest, index) => (
-                    <span key={index} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm">
-                      {interest}
-                    </span>
-                  ))}
-                </div>
+                
+                {isEditing ? (
+                  <div className="space-y-3">
+                    {/* Add new interest input */}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newInterest}
+                        onChange={(e) => setNewInterest(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Add a new interest..."
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddInterest}
+                        className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    
+                    {/* Display interests with remove option */}
+                    <div className="flex flex-wrap gap-2">
+                      {formData.interests.map((interest, index) => (
+                        <span 
+                          key={index} 
+                          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm flex items-center gap-2"
+                        >
+                          {interest}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveInterest(index)}
+                            className="text-red-500 hover:text-red-700 font-bold"
+                            aria-label="Remove interest"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.interests.map((interest, index) => (
+                      <span key={index} className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm">
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}

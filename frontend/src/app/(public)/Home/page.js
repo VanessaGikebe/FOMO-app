@@ -14,9 +14,11 @@ export default function PublicHome() {
           <p className="text-xl text-gray-600 mb-8">
             Find . Join . Enjoy
           </p>
-          <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-            Explore Events
-          </button>
+          <Link href="/p-events">
+            <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+              Explore Events
+            </button>
+          </Link>
         </div>
       </section>
 
@@ -46,9 +48,11 @@ export default function PublicHome() {
           <p className="text-gray-600 mb-8">
             Discover exciting experiences, connect with others, and create lasting memories
           </p>
-          <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-            Get Started
-          </button>
+          <Link href="/signin">
+            <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+              Get Started
+            </button>
+          </Link>
         </div>
       </section>
 
@@ -66,9 +70,11 @@ export default function PublicHome() {
               From live concerts and art exhibitions to community gatherings and networking events, FOMO connects you with experiences that matter. Whether you're looking to learn something new, meet like-minded people, or simply have a great time, we've got you covered. Our platform makes it easy to discover, plan, and attend events that align with your interests and schedule.
             </p>
             <div className="text-center">
-              <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-                Start Exploring
-              </button>
+              <Link href="/p-events">
+                <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+                  Browse Events
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -131,9 +137,11 @@ export default function PublicHome() {
           <p className="text-xl text-gray-600 mb-8">
             Create, share, or join events that inspire you. Your next adventure begins here.
           </p>
-          <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-            Create an Event
-          </button>
+          <Link href="/signin">
+            <button className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+              Get Started Today
+            </button>
+          </Link>
         </div>
       </section>
 

@@ -13,7 +13,7 @@ export default function Navbar({ userType = "public" }) {
       links: [
         { label: "Home", href: "/Home" },
         { label: "Events", href: "/p-events" },
-        { label: "About", href: "/about" },
+        { label: "About", href: "/p-about" },
       ],
       authButtons: [
         { label: "Sign In", href: "/signin", variant: "text" },
@@ -23,10 +23,10 @@ export default function Navbar({ userType = "public" }) {
     eventGoer: {
       logo: "FOMO",
       links: [
-        { label: "Dashboard", href: "/eventgoer_dashboard" },
-        { label: "Events", href: "/events" },
-        { label: "Favourites", href: "/favourites" },
-        { label: "Cart", href: "/cart" },
+        { label: "Dashboard", href: "/eg-dashboard" },
+        { label: "Events", href: "/eg-events" },
+        { label: "Favourites", href: "/eg-favourites" },
+        { label: "Cart", href: "/eg-cart" },
       ],
       showProfile: true,
       profileLink: "/profile",
