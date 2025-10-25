@@ -4,6 +4,7 @@ export { default as Navbar } from './UI Components/Navbar';
 export { default as EventCard } from './UI Components/EventCard';
 export { default as Button } from './UI Components/Button';
 export { default as SearchBar } from './UI Components/SearchBar';
+export { default as EventForm } from './UI Components/EventForm';
 
 // Page Components
 export { default as EventsPage } from './pages/EventsPage';

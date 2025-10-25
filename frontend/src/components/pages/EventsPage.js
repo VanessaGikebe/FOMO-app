@@ -1,92 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useEvents } from "@/contexts/EventsContext";
+import { useUser } from "@/contexts/UserContext";
+import Link from "next/link";
 import SearchBar from "../UI Components/SearchBar";
 import EventCard from "../UI Components/EventCard";
 import Footer from "../UI Components/Footer";
+import Button from "../UI Components/Button";
 
-// Sample event data - replace with actual data from API
-const sampleEvents = [
-  {
-    id: 1,
-    title: "Summer Music Festival 2025",
-    date: "July 15, 2025",
-    time: "6:00 PM",
-    location: "Central Park, Nairobi",
-    price: 2500,
-    category: "Music",
-    image: null,
-    description: "Join us for an unforgettable evening of live music featuring top local and international artists.",
-    attendees: 250
-  },
-  {
-    id: 2,
-    title: "Tech Innovation Summit",
-    date: "August 5, 2025",
-    time: "9:00 AM",
-    location: "Kenyatta International Convention Centre",
-    price: 5000,
-    category: "Technology",
-    image: null,
-    description: "Discover the latest trends in technology and innovation from industry leaders.",
-    attendees: 500
-  },
-  {
-    id: 3,
-    title: "Art Exhibition: Modern Kenya",
-    date: "July 20, 2025",
-    time: "10:00 AM",
-    location: "National Museum",
-    price: "Free",
-    category: "Arts & Culture",
-    image: null,
-    description: "Experience contemporary Kenyan art from emerging and established artists.",
-    attendees: 150
-  },
-  {
-    id: 4,
-    title: "Food & Wine Festival",
-    date: "September 10, 2025",
-    time: "12:00 PM",
-    location: "Karen Country Club",
-    price: 3500,
-    category: "Food & Drink",
-    image: null,
-    description: "Taste the best cuisines and wines from around the world in one place.",
-    attendees: 300
-  },
-  {
-    id: 5,
-    title: "Marathon for Health",
-    date: "October 1, 2025",
-    time: "6:00 AM",
-    location: "Uhuru Park",
-    price: 1000,
-    category: "Sports",
-    image: null,
-    description: "Run for a cause! Join our annual marathon supporting health initiatives.",
-    attendees: 1000
-  },
-  {
-    id: 6,
-    title: "Business Networking Evening",
-    date: "August 15, 2025",
-    time: "5:30 PM",
-    location: "Radisson Blu Hotel",
-    price: 2000,
-    category: "Business",
-    image: null,
-    description: "Connect with entrepreneurs and business leaders in a professional setting.",
-    attendees: 80
-  }
-];
+export default function EventsPage({ userType = "public" }) {
+  const { getAllEvents, events } = useEvents();
+  const { getUserId, currentUser } = useUser();
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]);
 
-export default function EventsPage() {
-  const [events, setEvents] = useState(sampleEvents);
-  const [filteredEvents, setFilteredEvents] = useState(sampleEvents);
+  useEffect(() => {
+    // Get events based on user type
+    // Public and eventGoer see only non-flagged events
+    // Organiser and moderator see all events
+    const includesFlagged = userType === "eventOrganiser" || userType === "moderator";
+    const fetchedEvents = getAllEvents(includesFlagged);
+    setAllEvents(fetchedEvents);
+    setFilteredEvents(fetchedEvents);
+  }, [userType, currentUser, events]); // Added 'events' dependency to re-render when events change
 
   const handleSearch = ({ searchTerm, category, location }) => {
-    let filtered = events;
+    let filtered = allEvents;
 
     // Filter by search term
     if (searchTerm) {
@@ -117,16 +57,33 @@ export default function EventsPage() {
     setFilteredEvents(filtered);
   };
 
+  // Get page title based on user type
+  const getPageTitle = () => {
+    switch (userType) {
+      case "eventOrganiser":
+        return "Manage Events";
+      case "moderator":
+        return "Moderate Events";
+      default:
+        return "Discover Events";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover Events
+            {getPageTitle()}
           </h1>
           <p className="text-xl text-gray-300 mb-8">
-            Find the perfect event that matches your interests
+            {userType === "eventOrganiser" 
+              ? "View and manage all events on the platform"
+              : userType === "moderator"
+              ? "Monitor and moderate all events"
+              : "Find the perfect event that matches your interests"
+            }
           </p>
           
           {/* Search Bar */}
@@ -141,11 +98,22 @@ export default function EventsPage() {
       {/* Events Grid */}
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
+          {/* Create Event Button for Event Organisers */}
+          {userType === "eventOrganiser" && (
+            <div className="mb-8">
+              <Link href="/eo-create_event_page">
+                <Button variant="primary" className="bg-black text-white hover:bg-gray-800">
+                  + Create New Event
+                </Button>
+              </Link>
+            </div>
+          )}
+
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900">
               {filteredEvents.length} Events Found
             </h2>
-            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+            <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white">
               <option>Sort by: Featured</option>
               <option>Sort by: Date</option>
               <option>Sort by: Price (Low to High)</option>
@@ -157,7 +125,12 @@ export default function EventsPage() {
           {filteredEvents.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <EventCard 
+                  key={event.id} 
+                  event={event} 
+                  userType={userType}
+                  userId={getUserId()}
+                />
               ))}
             </div>
           ) : (
