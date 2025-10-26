@@ -224,6 +224,125 @@ export function EventsProvider({ children }) {
     }
   };
 
+  // Cart state: managed here so components (cart page, event details) can interact
+  // Cart state is initialized empty on the server and populated on mount from
+  // localStorage in a client-only effect to avoid SSR/client markup mismatch.
+  const [cartItems, setCartItems] = useState([]);
+
+  // Load cart from localStorage after mount (client-only)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('fomo_cart');
+        if (saved) setCartItems(JSON.parse(saved));
+      } catch (err) {
+        console.error('Error parsing saved cart:', err);
+      }
+    }
+  }, []);
+
+  // Persist cart
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('fomo_cart', JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
+
+  // Add to cart. quantity defaults to 1.
+  // Returns { ok: boolean, reason?: string, finalQty?: number }
+  const addToCart = (eventId, quantity = 1, ticketType = 'Standard') => {
+    const ev = getEventById(eventId);
+    if (!ev) return { ok: false, reason: 'not_found' };
+
+    // compute tickets available (capacity minus attendees) if data exists
+    const ticketsAvailable = Math.max((ev.capacity ?? 0) - (ev.attendees ?? 0), 0);
+    // normalize quantity
+    const qty = Math.max(1, Number(quantity) || 1);
+
+    // if no tickets available, do not add
+    if (ticketsAvailable === 0) {
+      return { ok: false, reason: 'sold_out' };
+    }
+
+    // Work from the current cart snapshot to compute new cart synchronously
+    let result = { ok: false, reason: 'unknown' };
+    setCartItems((prev = []) => {
+      const existingIndex = prev.findIndex(item => item.eventId === eventId && item.ticketType === ticketType);
+      const newCart = [...prev];
+
+      if (existingIndex !== -1) {
+        const existing = prev[existingIndex];
+        const desired = existing.quantity + qty;
+        const newQty = Math.min(desired, ticketsAvailable);
+        if (newQty === existing.quantity) {
+          result = { ok: false, reason: 'max_reached', finalQty: existing.quantity };
+          return prev; // no change
+        }
+        newCart[existingIndex] = { ...existing, quantity: newQty, ticketsAvailable };
+        result = { ok: true, finalQty: newQty };
+        return newCart;
+      }
+
+      const item = {
+        id: ev.id,
+        eventId: ev.id,
+        eventName: ev.title,
+        venue: ev.location || ev.venue || '',
+        date: ev.date || '',
+        time: ev.time || '',
+        ticketType,
+        ticketsAvailable,
+        pricePerTicket: Number(ev.price) || 0,
+        quantity: Math.min(qty, ticketsAvailable || qty)
+      };
+
+      // only add if final quantity > 0
+      if (item.quantity <= 0) {
+        result = { ok: false, reason: 'invalid_quantity' };
+        return prev;
+      }
+      newCart.push(item);
+      result = { ok: true, finalQty: item.quantity };
+      return newCart;
+    });
+    return result;
+  };
+
+  // Update quantity for a cart item. Returns { ok, reason?, finalQty? }
+  const updateCartQuantity = (itemId, quantity) => {
+    let result = { ok: false, reason: 'unknown' };
+    setCartItems((prev = []) => {
+      const idx = prev.findIndex(it => it.id === itemId || it.eventId === itemId);
+      if (idx === -1) {
+        result = { ok: false, reason: 'not_found' };
+        return prev;
+      }
+
+      const item = prev[idx];
+      const ev = getEventById(item.eventId);
+      const ticketsAvailable = Math.max((ev?.capacity ?? 0) - (ev?.attendees ?? 0), 0);
+      let qty = Math.max(0, Number(quantity) || 0);
+      let clamped = false;
+      if (qty > ticketsAvailable) {
+        qty = ticketsAvailable;
+        clamped = true;
+      }
+
+      const newCart = prev.map((it, i) => i === idx ? { ...it, quantity: qty, ticketsAvailable } : it);
+      result = { ok: true, finalQty: qty, clamped };
+      return newCart;
+    });
+    return result;
+  };
+
+  const removeFromCart = (itemId) => {
+    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const getCartTotal = () => {
+    return cartItems.reduce((sum, it) => sum + (Number(it.pricePerTicket) || 0) * (it.quantity || 0), 0);
+  };
+
   const value = {
     events,
     getAllEvents,
@@ -235,7 +354,13 @@ export function EventsProvider({ children }) {
     flagEvent,
     unflagEvent,
     isEventOwner,
-    resetEvents
+    resetEvents,
+    // Cart API
+    cartItems,
+    addToCart,
+    updateCartQuantity,
+    removeFromCart,
+    getCartTotal
   };
 
   return (

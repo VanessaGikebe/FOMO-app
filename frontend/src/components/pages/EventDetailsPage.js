@@ -14,8 +14,8 @@ export default function EventDetailsPage({
   eventId = null 
 }) {
   const router = useRouter();
-  const { currentUser, addToCart } = useUser();
-  const { deleteEvent, flagEvent, unflagEvent, isEventOwner } = useEvents();
+  const { currentUser } = useUser();
+  const { deleteEvent, flagEvent, unflagEvent, isEventOwner, addToCart } = useEvents();
   
   const [selectedTickets, setSelectedTickets] = useState(1);
   const [ticketLimit, setTicketLimit] = useState(eventData?.capacity || 100);
@@ -60,8 +60,21 @@ export default function EventDetailsPage({
       alert("Please sign in to purchase tickets!");
       return;
     }
-    addToCart(event.id, selectedTickets);
-    alert(`Added ${selectedTickets} ticket(s) to cart!`);
+    const result = addToCart(event.id, selectedTickets);
+    if (result?.ok) {
+      alert(`Added ${result.finalQty ?? selectedTickets} ticket(s) to cart!`);
+    } else {
+      const reason = result?.reason || 'error';
+      if (reason === 'sold_out') {
+        alert('Sorry, tickets for this event are sold out.');
+      } else if (reason === 'max_reached') {
+        alert('Could not add more tickets — you have reached the maximum available.');
+      } else if (reason === 'not_found') {
+        alert('Event not found.');
+      } else {
+        alert('Could not add tickets to cart.');
+      }
+    }
   };
 
   // Handle ticket limit update (organiser only)

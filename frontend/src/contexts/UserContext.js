@@ -103,24 +103,8 @@ export function UserProvider({ children }) {
   };
 
   // Add to cart (eventGoer only)
-  const addToCart = (eventId) => {
-    if (currentUser?.type === "eventGoer") {
-      setCurrentUser(prev => ({
-        ...prev,
-        cart: [...prev.cart, eventId]
-      }));
-    }
-  };
-
-  // Remove from cart
-  const removeFromCart = (eventId) => {
-    if (currentUser?.type === "eventGoer") {
-      setCurrentUser(prev => ({
-        ...prev,
-        cart: prev.cart.filter(id => id !== eventId)
-      }));
-    }
-  };
+  // NOTE: Cart is managed in EventsContext. Legacy user-level cart functions
+  // were removed to avoid duplicate sources of truth.
 
   const value = {
     currentUser,
@@ -132,8 +116,7 @@ export function UserProvider({ children }) {
     addToFavorites,
     removeFromFavorites,
     isFavorite,
-    addToCart,
-    removeFromCart
+    // legacy cart functions removed; use EventsContext for cart operations
   };
 
   return (
