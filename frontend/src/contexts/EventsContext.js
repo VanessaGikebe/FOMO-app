@@ -339,6 +339,11 @@ export function EventsProvider({ children }) {
     setCartItems(prev => prev.filter(item => item.id !== itemId));
   };
 
+  // Clear entire cart
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   const getCartTotal = () => {
     return cartItems.reduce((sum, it) => sum + (Number(it.pricePerTicket) || 0) * (it.quantity || 0), 0);
   };
@@ -360,7 +365,8 @@ export function EventsProvider({ children }) {
     addToCart,
     updateCartQuantity,
     removeFromCart,
-    getCartTotal
+    getCartTotal,
+    clearCart
   };
 
   return (
