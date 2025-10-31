@@ -11,7 +11,8 @@ const initialEvents = [
     title: "Tech Summit 2025",
     description: "Join us for the biggest tech conference of the year featuring industry leaders, cutting-edge innovations, and networking opportunities.",
     category: "Technology",
-    date: "2025-11-15",
+  // Temporarily set to today for testing notifications
+  date: "2025-11-01",
     time: "09:00 AM",
     location: "Nairobi Convention Centre",
     price: 2500,
@@ -29,7 +30,8 @@ const initialEvents = [
     title: "Jazz Night Live",
     description: "An evening of smooth jazz featuring local and international artists. Enjoy great music, food, and drinks.",
     category: "Music",
-    date: "2025-11-20",
+  // Temporarily set to tomorrow for testing notifications
+  date: "2025-11-02",
     time: "07:00 PM",
     location: "The Alchemist Bar",
     price: 1500,
@@ -117,27 +119,26 @@ const initialEvents = [
 ];
 
 export function EventsProvider({ children }) {
-  // Initialize state from localStorage or use initialEvents
-  const [events, setEvents] = useState(() => {
-    if (typeof window !== 'undefined') {
+  // Load events; start with built-in data on the server and hydrate on client.
+  const [events, setEvents] = useState(initialEvents);
+
+  // Load saved events on client mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
       const savedEvents = localStorage.getItem('fomo_events');
       if (savedEvents) {
-        try {
-          return JSON.parse(savedEvents);
-        } catch (error) {
-          console.error('Error parsing saved events:', error);
-          return initialEvents;
-        }
+        setEvents(JSON.parse(savedEvents));
       }
+    } catch (error) {
+      console.error('Error parsing saved events:', error);
     }
-    return initialEvents;
-  });
+  }, []);
 
-  // Save events to localStorage whenever they change
+  // Persist events to localStorage (client-side)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('fomo_events', JSON.stringify(events));
-    }
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('fomo_events', JSON.stringify(events));
   }, [events]);
 
   // Get all events (with optional filtering for non-flagged)
@@ -224,9 +225,7 @@ export function EventsProvider({ children }) {
     }
   };
 
-  // Cart state: managed here so components (cart page, event details) can interact
-  // Cart state is initialized empty on the server and populated on mount from
-  // localStorage in a client-only effect to avoid SSR/client markup mismatch.
+  // Cart state
   const [cartItems, setCartItems] = useState([]);
 
   // Load cart from localStorage after mount (client-only)

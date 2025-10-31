@@ -30,30 +30,29 @@ const mockUsers = {
 };
 
 export function UserProvider({ children }) {
-  // Initialize state from localStorage or use null
-  const [currentUser, setCurrentUser] = useState(() => {
-    if (typeof window !== 'undefined') {
+  // Load current user from localStorage on client mount (SSR-safe)
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Load saved user on client mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
       const savedUser = localStorage.getItem('fomo_current_user');
       if (savedUser) {
-        try {
-          return JSON.parse(savedUser);
-        } catch (error) {
-          console.error('Error parsing saved user:', error);
-          return null;
-        }
+        setCurrentUser(JSON.parse(savedUser));
       }
+    } catch (error) {
+      console.error('Error parsing saved user:', error);
     }
-    return null;
-  });
+  }, []);
 
-  // Save currentUser to localStorage whenever it changes
+  // Persist currentUser to localStorage (client-side)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (currentUser) {
-        localStorage.setItem('fomo_current_user', JSON.stringify(currentUser));
-      } else {
-        localStorage.removeItem('fomo_current_user');
-      }
+    if (typeof window === 'undefined') return;
+    if (currentUser) {
+      localStorage.setItem('fomo_current_user', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('fomo_current_user');
     }
   }, [currentUser]);
 

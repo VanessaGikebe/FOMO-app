@@ -25,7 +25,7 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Redirect to cart if empty — use effect to avoid render-side router.push
+  // Redirect to cart if empty 
   useEffect(() => {
     if (!cartItems || cartItems.length === 0) {
       router.push("/eg-cart");
@@ -88,12 +88,6 @@ export default function CheckoutPage() {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // In a real app, you would:
-      // 1. Send payment request to backend
-      // 2. Process payment with MPESA API
-      // 3. Create order record
-      // 4. Send confirmation email
-      // 5. Update event attendees count
 
       // Clear cart after successful payment
       if (typeof clearCart === 'function') {

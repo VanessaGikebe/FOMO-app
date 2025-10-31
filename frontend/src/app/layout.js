@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { EventsProvider } from "@/contexts/EventsContext";
 import { UserProvider } from "@/contexts/UserContext";
+import {NotificationsProvider} from "@/contexts/NotifContext";
 import DevTools from "@/components/DevTools";
 
 const geistSans = Geist({
@@ -27,8 +28,10 @@ export default function RootLayout({ children }) {
       >
         <EventsProvider>
           <UserProvider>
-            {children}
-            <DevTools />
+            <NotificationsProvider>
+              {children}
+              <DevTools />
+            </NotificationsProvider>
           </UserProvider>
         </EventsProvider>
       </body>
