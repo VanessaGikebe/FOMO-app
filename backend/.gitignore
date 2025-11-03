@@ -54,3 +54,13 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Firebase service account key (if any)
+serviceAccountKey.json
+
+# Next.js / frontend build artifacts (if applicable)
+.next/
+out/
+
+# Temporary local files
+*.local

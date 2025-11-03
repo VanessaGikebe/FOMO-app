@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useNotifications } from "@/contexts/NotifContext";
 
 export default function Navbar({ userType = "public" }) {
   const pathname = usePathname();
+  const { unreadCount } = useNotifications();
 
   // Define navigation items based on user type
   const navigationConfig = {
@@ -29,7 +31,9 @@ export default function Navbar({ userType = "public" }) {
         { label: "Cart", href: "/eg-cart" },
       ],
       showProfile: true,
+      showNotifications: true,
       profileLink: "/profile",
+      notificationsLink: "/eg-notifications",
     },
     eventOrganiser: {
       logo: "FOMO",
@@ -38,6 +42,7 @@ export default function Navbar({ userType = "public" }) {
         { label: "Manage Events", href: "/eo-manageEvents" },
       ],
       showProfile: true,
+      showNotifications: true,
       profileLink: "/eo-profile",
     },
     moderator: {
@@ -48,6 +53,7 @@ export default function Navbar({ userType = "public" }) {
         { label: "Manage Organisers", href: "/m-manageOrganiser" },
       ],
       showProfile: true,
+      showNotifications: true,
       profileLink: "/m-profile",
     },
   };
@@ -106,6 +112,25 @@ export default function Navbar({ userType = "public" }) {
                   </Link>
                 ))}
               </>
+            )}
+
+            {/* Notifications Bell (for event goers only) */}
+            {config.showNotifications && (
+              // Simple notifications link (no dropdown). Clicking navigates to
+              // the full notifications page.
+              <Link
+                href={config.notificationsLink}
+                className="relative w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                title="Notifications"
+                aria-label="Notifications"
+              >
+                <span className="text-xl" aria-hidden>🔔</span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" aria-live="polite">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
             )}
 
             {/* Profile Icon (for authenticated users) */}
