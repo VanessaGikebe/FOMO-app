@@ -1,115 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 
-// --- Helper Components (Copied from Sign In) ---
-
-const Label = ({ htmlFor, children, className }) => (
-  <label htmlFor={htmlFor} className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}>
-    {children}
-  </label>
-);
-
-const Input = React.forwardRef(({ className, type, ...props }, ref) => (
-  <input
-    type={type}
-    className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${className}`}
-    ref={ref}
-    {...props}
-  />
-));
-Input.displayName = "Input";
-
-const Button = React.forwardRef(({ className, variant, type = 'button', children, disabled, ...props }, ref) => {
-    // Note: Tailwind theme variables are used here (primary, foreground, background, etc.)
-    const baseStyles = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2";
-    
-    let variantStyles = '';
-    if (variant === 'outline') {
-        variantStyles = 'border border-foreground bg-background hover:bg-accent hover:text-accent-foreground';
-    } else {
-        variantStyles = 'bg-primary text-primary-foreground hover:bg-primary/90';
-    }
-
-    return (
-        <button
-            ref={ref}
-            className={`${baseStyles} ${variantStyles} ${className}`}
-            type={type}
-            disabled={disabled}
-            {...props}
-        >
-            {children}
-        </button>
-    );
-});
-Button.displayName = "Button";
-
-
-const Select = ({ value, onValueChange, children }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    
-    const handleSelect = (newValue) => {
-        onValueChange(newValue);
-        setIsOpen(false);
-    };
-
-    return (
-        <div className="relative">
-            <div onClick={() => setIsOpen(!isOpen)} className="cursor-pointer">
-                {children[0]}
-            </div>
-            {isOpen && (
-                <div className="absolute z-10 w-full mt-1 overflow-hidden rounded-md border border-border bg-white text-popover-foreground">
-                    {React.Children.map(children[1], child => 
-                        React.cloneElement(child, {
-                            onClick: () => handleSelect(child.props.value),
-                            selectedValue: value
-                        })
-                    )}
-                </div>
-            )}
-        </div>
-    );
-};
-
-const SelectTrigger = ({ className, children }) => (
-    <div className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors [&>span]:line-clamp-1 ${className}`}>
-        {children}
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 opacity-50"><path d="m6 9 6 6 6-6"/></svg>
-    </div>
-);
-
-const SelectValue = ({ text, placeholder }) => (
-    <span className="pointer-events-none">
-        {text || placeholder || "Select an option"}
-    </span>
-);
-
-const SelectContent = ({ children }) => <>{children}</>;
-
-const SelectItem = ({ value, children, onClick, selectedValue }) => (
-    <div 
-        onClick={onClick}
-        className={`relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${selectedValue === value ? 'font-semibold bg-accent' : 'hover:bg-accent'}`}
-    >
-        {children}
-    </div>
-);
-
-const Link = ({ href, className, children }) => (
-    <a href={href} className={className}>
-        {children}
-    </a>
-);
-
-
-// --- Main Component ---
-
-export default function App() {
+export default function SignUp() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [label, setLabel] = useState('experience_seeker'); // Default to a value
+  const [label, setLabel] = useState('experience_seeker'); 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -130,16 +27,12 @@ export default function App() {
         console.log('Sign up attempt finished.');
     }, 1500);
   };
+  
+  // Base classes for consistent input/select styling
+  const inputBaseClasses = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors";
 
-  // Determine the display value for the Select component
-  const getLabelText = (val) => {
-    switch (val) {
-        case 'experience_seeker': return 'Experience Seeker';
-        case 'event_organiser': return 'Event Organiser';
-        case 'moderator': return 'Moderator';
-        default: return 'Select an account type';
-    }
-  };
+  // Base classes for consistent button styling
+  const buttonBaseClasses = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-semibold ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2";
 
 
   return (
@@ -151,7 +44,7 @@ export default function App() {
         
         {/* Centered Logo and FOMO text */}
         <div className="flex flex-col items-center mb-6">
-            {/* Replaced image input with a static img tag */}
+            {/* Logo image */}
             <img 
                 src="https://via.placeholder.com/64x64.png?text=Logo" // Placeholder image URL
                 alt="Logo" 
@@ -167,102 +60,104 @@ export default function App() {
           
           {/* 1. Full Name */}
           <div className="space-y-2">
-            <Label htmlFor="fullName" className="text-foreground">
+            <label htmlFor="fullName" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Full Name
-            </Label>
-            <Input
+            </label>
+            <input
               id="fullName"
               type="text"
               placeholder="Full Name"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
             />
           </div>
 
           {/* 2. Email */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">
+            <label htmlFor="email" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Email
-            </Label>
-            <Input
+            </label>
+            <input
               id="email"
               type="email"
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
             />
           </div>
 
-          {/* 3. Account Type (Label) */}
+          {/* 3. Account Type (Simple Native Select) */}
           <div className="space-y-2">
-            <Label htmlFor="label" className="text-foreground">
+            <label htmlFor="label" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Account Type
-            </Label>
-            <Select value={label} onValueChange={setLabel}>
-              <SelectTrigger className="bg-background border-border text-foreground">
-                <SelectValue text={getLabelText(label)} placeholder="Select an account type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="experience_seeker">Experience Seeker</SelectItem>
-                <SelectItem value="event_organiser">Event Organiser</SelectItem>
-                <SelectItem value="moderator">Moderator</SelectItem>
-              </SelectContent>
-            </Select>
+            </label>
+            <select
+              id="label"
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              required
+              // Custom styles applied: mt-1 for margin, bg-white, and consistent input styling
+              className="mt-1 h-10 w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors"
+            >
+                <option value="experience_seeker">Experience Seeker</option>
+                <option value="event_organiser">Event Organiser</option>
+                <option value="moderator">Moderator</option>
+            </select>
           </div>
 
           {/* 4. Password */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-foreground">
+            <label htmlFor="password" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Password
-            </Label>
-            <Input
+            </label>
+            <input
               id="password"
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
             />
           </div>
 
           {/* 5. Confirm Password */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-foreground">
+            <label htmlFor="confirmPassword" className="text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Confirm Password
-            </Label>
-            <Input
+            </label>
+            <input
               id="confirmPassword"
               type="password"
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
             />
           </div>
           
-          {/* Already have an account? Link - Adjusted font-medium for full consistency */}
+          {/* Already have an account? Link */}
           <div className="text-left pt-2">
-            <p className="text-muted-foreground text-sm font-medium">
-                Already have an account?{" "}
-                <Link href="/sign-in" className="text-foreground hover:underline transition-colors">
-                    Log In
-                </Link>
-            </p>
+        <p className="text-muted-foreground text-sm font-medium">
+          Already have an account?{" "}
+          <Link href="/signin" className="text-foreground hover:underline transition-colors">
+            Sign In
+          </Link>
+        </p>
           </div>
           
 
-          {/* Sign Up Button (Styles matched to Google button for consistency, text-foreground is black) */}
-          <Button
+          {/* Sign Up Button (Black Border and Text) */}
+          <button
             type="submit"
             disabled={isLoading || password !== confirmPassword || !password}
-            className="w-full border-foreground bg-white text-foreground hover:bg-gray-50 hover:text-foreground transition-colors"
-            variant="outline" 
+            // Inlined base styles + outline variant styles
+            className={`${buttonBaseClasses} w-full border border-foreground bg-white text-foreground hover:bg-gray-50 hover:text-foreground transition-colors`}
           >
             {isLoading ? (
               <>
@@ -273,7 +168,7 @@ export default function App() {
                 Signing Up...
               </>
             ) : "Sign Up"}
-          </Button>
+          </button>
 
           {/* OR Separator */}
           <div className="relative my-6">
@@ -286,10 +181,10 @@ export default function App() {
           </div>
 
           {/* Continue With Google Button (Google logo black) */}
-          <Button
+          <button
             type="button"
-            variant="outline"
-            className="w-full border-foreground bg-white text-foreground hover:bg-gray-50 hover:text-foreground transition-colors"
+            // Inlined base styles + outline variant styles
+            className={`${buttonBaseClasses} w-full border border-foreground bg-white text-foreground hover:bg-gray-50 hover:text-foreground transition-colors`}
           >
             {/* Google Logo SVG - Set to text-foreground (black) */}
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">
@@ -311,7 +206,7 @@ export default function App() {
               />
             </svg>
             Continue With Google
-          </Button>
+          </button>
         </form>
       </div>
     </div>
