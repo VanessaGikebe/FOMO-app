@@ -2,8 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventsController } from './events.controller';
 import { EventsService } from './events.service';
-import { SearchEventsDto } from './dto';
-
+import { SearchEventsDto, FlagEventDto, RejectEventDto } from './dto';
 describe('EventsController - Event Discovery', () => {
   let controller: EventsController;
   let service: EventsService;
@@ -279,7 +278,7 @@ describe('EventsController - Event Discovery', () => {
 
         mockEventsService.rejectEvent.mockResolvedValue(mockResponse);
 
-        const result = await controller.rejectEvent('event123', 'Spam content');
+        const result = await controller.rejectEvent('event123', { reason: 'Spam content' });
 
         expect(result).toEqual(mockResponse);
         expect(service.rejectEvent).toHaveBeenCalledWith('event123', 'Spam content');
@@ -294,7 +293,7 @@ describe('EventsController - Event Discovery', () => {
 
         mockEventsService.rejectEvent.mockResolvedValue(mockResponse);
 
-        const result = await controller.rejectEvent('event123');
+        const result = await controller.rejectEvent('event123', undefined);
 
         expect(result).toEqual(mockResponse);
         expect(service.rejectEvent).toHaveBeenCalledWith('event123', undefined);
