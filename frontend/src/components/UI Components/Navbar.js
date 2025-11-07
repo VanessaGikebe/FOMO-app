@@ -32,7 +32,7 @@ export default function Navbar({ userType = "public" }) {
       ],
       showProfile: true,
       showNotifications: true,
-      profileLink: "/profile",
+      profileLink: "/eg-profile",
       notificationsLink: "/eg-notifications",
     },
     eventOrganiser: {
@@ -143,9 +143,9 @@ export default function Navbar({ userType = "public" }) {
                 >
                   <span className="text-xl">👤</span>
                 </Link>
-                <button className="bg-black text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                  Sign Out
-                </button>
+                <Link href="/Home" className="bg-black text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                    Sign Out
+                </Link>
               </>
             )}
           </div>
