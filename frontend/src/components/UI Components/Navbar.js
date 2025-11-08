@@ -53,7 +53,7 @@ export default function Navbar({ userType = "public" }) {
         { label: "Manage Organisers", href: "/m-manageOrganiser" },
       ],
       showProfile: true,
-      showNotifications: true,
+      showNotifications: false,
       profileLink: "/m-profile",
     },
   };
