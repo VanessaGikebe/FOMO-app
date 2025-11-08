@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
+import './firebase/firebase.config';
 
 async function bootstrap() {
   dotenv.config();
