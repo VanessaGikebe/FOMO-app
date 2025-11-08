@@ -42,7 +42,7 @@ export default function Navbar({ userType = "public" }) {
         { label: "Manage Events", href: "/eo-manageEvents" },
       ],
       showProfile: true,
-      showNotifications: true,
+      showNotifications: false,
       profileLink: "/eo-profile",
     },
     moderator: {
