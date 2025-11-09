@@ -3,21 +3,21 @@ import { AppModule } from './app.module';
 import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
-import './firebase/firebase.config';
+
 
 async function bootstrap() {
   dotenv.config();
 
-  // Initialize Firebase
+  const serviceAccount = require(join(__dirname,'serviceAccountKey.json'));
+
   admin.initializeApp({
-    credential: admin.credential.cert(
-      require(join(__dirname, '../serviceAccountKey.json')),
-    ),
+    credential: admin.credential.cert(serviceAccount),
   });
 
   const app = await NestFactory.create(AppModule);
-  app.enableCors(); // allow frontend requests from localhost:3000
-  await app.listen(4000);
-  console.log(`🚀 Backend is running on http://localhost:4000`);
+  app.enableCors();
+  await app.listen(3000);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
+
 bootstrap();

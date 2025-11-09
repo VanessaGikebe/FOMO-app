@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { ServiceAccount } from 'firebase-admin';
 
-import serviceAccount from './serviceAccountKey.json';
+import serviceAccount from 'serviceAccountKey.json';
 
 // Only initialize once
 if (!admin.apps.length) {
