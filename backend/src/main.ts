@@ -3,14 +3,21 @@ import { AppModule } from './app.module';
 import * as admin from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
+import * as fs from 'fs';
 
 async function bootstrap() {
   dotenv.config();
 
-  // Initialize Firebase
+  const serviceAccountPath = join(__dirname, "../serviceAccountKey.json");
+  if (!fs.existsSync(serviceAccountPath)) {
+    throw new Error(
+      `❌ serviceAccountKey.json not found at: ${serviceAccountPath}`,
+    );
+  }
+
   admin.initializeApp({
     credential: admin.credential.cert(
-      require(join(__dirname, '../serviceAccountKey.json')),
+      require(join(__dirname, "../serviceAccountKey.json")),
     ),
   });
 

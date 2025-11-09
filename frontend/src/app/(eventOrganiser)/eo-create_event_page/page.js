@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
-import EventForm from "@/components/UI Components/EventForm";
+import EventForm from "@/components/UIComponents/EventForm";
 import { Footer } from "@/components";
 
 export default function CreateEventPage() {

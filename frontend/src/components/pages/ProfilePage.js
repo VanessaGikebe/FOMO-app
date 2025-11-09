@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Footer from "../UI Components/Footer";
-import Button from "../UI Components/Button";
+import Footer from "../UIComponents/Footer";
+import Button from "../UIComponents/Button";
 
 // Sample user data - in real app, this would come from authentication
 const sampleUser = {

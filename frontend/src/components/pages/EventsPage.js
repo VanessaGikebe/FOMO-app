@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
-import SearchBar from "../UI Components/SearchBar";
-import EventCard from "../UI Components/EventCard";
-import Footer from "../UI Components/Footer";
-import Button from "../UI Components/Button";
+import SearchBar from "../UIComponents/SearchBar";
+import EventCard from "../UIComponents/EventCard";
+import Footer from "../UIComponents/Footer";
+import Button from "../UIComponents/Button";
 
 export default function EventsPage({ userType = "public" }) {
   const { getAllEvents, events } = useEvents();

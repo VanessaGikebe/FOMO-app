@@ -1,10 +1,10 @@
 // UI Components
-export { default as Footer } from './UI Components/Footer';
-export { default as Navbar } from './UI Components/Navbar';
-export { default as EventCard } from './UI Components/EventCard';
-export { default as Button } from './UI Components/Button';
-export { default as SearchBar } from './UI Components/SearchBar';
-export { default as EventForm } from './UI Components/EventForm';
+export { default as Footer } from './UIComponents/Footer';
+export { default as Navbar } from './UIComponents/Navbar';
+export { default as EventCard } from './UIComponents/EventCard';
+export { default as Button } from './UIComponents/Button';
+export { default as SearchBar } from './UIComponents/SearchBar';
+export { default as EventForm } from './UIComponents/EventForm';
 
 // Page Components
 export { default as EventsPage } from './pages/EventsPage';

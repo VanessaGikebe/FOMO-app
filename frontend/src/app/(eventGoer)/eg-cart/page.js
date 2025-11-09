@@ -2,8 +2,8 @@
 
 import { useEvents } from "@/contexts/EventsContext";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/UI Components/Footer";
-import Button from "@/components/UI Components/Button";
+import Footer from "@/components/UIComponents/Footer";
+import Button from "@/components/UIComponents/Button";
 
 export default function CartPage() {
   // Use EventsContext cart API

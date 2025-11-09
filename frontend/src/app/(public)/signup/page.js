@@ -1,4 +1,4 @@
-import SignUp from "../../../components/UI Components/SignUp.js";
+import SignUp from "../../../components/UIComponents/SignUp.js";
 
 export default function SignUpPage() {
     return (

@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/contexts/UserContext";
 import { useEvents } from "@/contexts/EventsContext";
-import Footer from "../UI Components/Footer";
-import Button from "../UI Components/Button";
+import Footer from "../UIComponents/Footer";
+import Button from "../UIComponents/Button";
 
 export default function EventDetailsPage({ 
   eventData, 

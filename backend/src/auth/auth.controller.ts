@@ -1,29 +1,26 @@
-import { Body, Controller, Post, Get, Headers } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import * as admin from 'firebase-admin';
+import { Controller, Post, Body } from "@nestjs/common";
+import { AuthService } from "./auth.service";
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
+  @Post("signup")
   async signup(
     @Body()
     body: {
       email: string;
       password: string;
-      role?: 'attendee' | 'organizer' | 'moderator';
+      fullName: string;
+      role: string;
     },
-  ): Promise<{ uid: string; email: string | undefined; role: string }> {
-    const { email, password, role } = body;
-    return this.authService.registerUser(email, password, role);
-  }
-
-  @Get('user')
-  async getUser(
-    @Headers('authorization') authHeader: string,
-  ): Promise<admin.auth.DecodedIdToken> {
-    const token = authHeader?.split(' ')[1];
-    return this.authService.verifyToken(token);
+  ) {
+    const { email, password, fullName, role } = body;
+    return this.authService.registerUser(
+      email,
+      password,
+      role as any,
+      fullName,
+    );
   }
 }

@@ -2,7 +2,7 @@
 
 import { useUser } from "@/contexts/UserContext";
 import { useEvents } from "@/contexts/EventsContext";
-import EventCard from "@/components/UI Components/EventCard";
+import EventCard from "@/components/UIComponents/EventCard";
 import { Footer } from "@/components";
 
 export default function FavouritesPage() {
