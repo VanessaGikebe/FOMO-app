@@ -1,9 +1,10 @@
 'use client';
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../lib/firebaseConfig";
+import { auth, db } from "../../lib/firebaseConfig";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -16,27 +17,34 @@ export default function SignIn() {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
+
     try {
+      // 1️⃣ Sign in with Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const tokenResult = await user.getIdTokenResult();
-      const role = tokenResult.claims.role || "attendee";
 
+      // 2️⃣ Fetch user role from Firestore
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) throw new Error("User data not found in Firestore");
+
+      const { role } = userDoc.data();
       console.log("✅ Signed in as:", role);
+
+      // 3️⃣ Redirect based on role
       switch (role) {
         case "organizer":
-          router.push("/organizer-dashboard");
+          router.push("/eo-dashboard");
           break;
         case "moderator":
-          router.push("/moderator-dashboard");
+          router.push("/m-dashboard");
           break;
         default:
-          router.push("/attendee-dashboard");
+          router.push("/eg-dashboard");
           break;
       }
     } catch (error) {
       console.error("❌ Sign in error:", error);
-      setErrorMessage("Invalid credentials. Please try again.");
+      setErrorMessage("Invalid credentials or user data not found. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -99,4 +107,3 @@ export default function SignIn() {
     </div>
   );
 }
-
