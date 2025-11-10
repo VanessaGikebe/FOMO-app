@@ -1,14 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useNotifications } from "@/contexts/NotifContext";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebaseConfig";
 
 export default function Navbar({ userType = "public" }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { unreadCount } = useNotifications();
 
-  // Define navigation items based on user type
+  // 🔹 Sign out function
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push("/signin");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  // 🔹 Navigation configuration
   const navigationConfig = {
     public: {
       logo: "FOMO",
@@ -44,6 +57,7 @@ export default function Navbar({ userType = "public" }) {
       showProfile: true,
       showNotifications: true,
       profileLink: "/eo-profile",
+      notificationsLink: "/eo-notifications", // ✅ Added
     },
     moderator: {
       logo: "FOMO",
@@ -55,14 +69,12 @@ export default function Navbar({ userType = "public" }) {
       showProfile: true,
       showNotifications: true,
       profileLink: "/m-profile",
+      notificationsLink: "/m-notifications", // ✅ Added
     },
   };
 
   const config = navigationConfig[userType];
-
-  const isActive = (href) => {
-    return pathname === href || pathname.startsWith(href);
-  };
+  const isActive = (href) => pathname === href || pathname.startsWith(href);
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -95,7 +107,7 @@ export default function Navbar({ userType = "public" }) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
-            {/* Auth Buttons (for public) */}
+            {/* Auth Buttons (for public users) */}
             {config.authButtons && (
               <>
                 {config.authButtons.map((button) => (
@@ -114,10 +126,8 @@ export default function Navbar({ userType = "public" }) {
               </>
             )}
 
-            {/* Notifications Bell (for event goers only) */}
-            {config.showNotifications && (
-              // Simple notifications link (no dropdown). Clicking navigates to
-              // the full notifications page.
+            {/* Notifications Bell (if available) */}
+            {config.showNotifications && config.notificationsLink && (
               <Link
                 href={config.notificationsLink}
                 className="relative w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
@@ -133,7 +143,7 @@ export default function Navbar({ userType = "public" }) {
               </Link>
             )}
 
-            {/* Profile Icon (for authenticated users) */}
+            {/* Profile Icon + Sign Out */}
             {config.showProfile && (
               <>
                 <Link
@@ -143,7 +153,11 @@ export default function Navbar({ userType = "public" }) {
                 >
                   <span className="text-xl">👤</span>
                 </Link>
-                <button className="bg-black text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+
+                <button
+                  onClick={handleSignOut}
+                  className="bg-black text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                >
                   Sign Out
                 </button>
               </>

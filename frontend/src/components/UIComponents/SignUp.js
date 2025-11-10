@@ -1,9 +1,10 @@
 'use client';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "../../lib/firebaseConfig";
+import { auth, db } from "../../lib/firebaseConfig";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function SignUp() {
   const [fullName, setFullName] = useState('');
@@ -18,10 +19,22 @@ export default function SignUp() {
     e.preventDefault();
     setIsLoading(true);
     setSuccessMessage('');
+
     try {
+      // 1️⃣ Create Firebase Auth user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      // 2️⃣ Update display name
       await updateProfile(user, { displayName: fullName });
+
+      // 3️⃣ Store role in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        fullName,
+        email,
+        role,
+        createdAt: serverTimestamp()
+      });
 
       console.log("✅ Signup success:", { email, role });
       setSuccessMessage("✅ Account created successfully! Redirecting to Sign In...");
