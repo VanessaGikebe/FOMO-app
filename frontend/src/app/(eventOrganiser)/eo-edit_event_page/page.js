@@ -1,4 +1,3 @@
-import { Footer } from "@/components";
 
 export default function EventOrganiserEditEventPage() {
   return (
@@ -8,8 +7,6 @@ export default function EventOrganiserEditEventPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-8">Edit Event</h1>
           <p className="text-gray-600">Edit event details for organiser will go here.</p>
         </div>
-      </div>
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }

@@ -9,8 +9,10 @@ export default function ModeratorLayout({ children }) {
 
   useEffect(() => {
     // Auto-login as moderator for development/testing
+    console.log("Moderator Layout: Current user:", currentUser);
     if (!currentUser || currentUser.type !== "moderator") {
       login("moderator");
+      console.log("Moderator Layout: Logged in as moderator");
     }
   }, []);
 

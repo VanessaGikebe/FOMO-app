@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/contexts/UserContext";
 import { useEvents } from "@/contexts/EventsContext";
-import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 
 export default function EventDetailsPage({ 
@@ -490,8 +489,6 @@ export default function EventDetailsPage({
           </div>
         </section>
       )}
-
-      <Footer />
     </div>
   );
 }

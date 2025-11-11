@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Footer } from "@/components";
 
 export default function EventOrganiserDetailsPage() {
   const router = useRouter();
@@ -19,8 +18,6 @@ export default function EventOrganiserDetailsPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-8">Event Details</h1>
           <p className="text-gray-600">Redirecting to your events...</p>
         </div>
-      </div>
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }

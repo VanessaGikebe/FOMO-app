@@ -9,8 +9,10 @@ export default function EventOrganiserLayout({ children }) {
 
   useEffect(() => {
     // Auto-login as eventOrganiser for development/testing
+    console.log("EventOrganiser Layout: Current user:", currentUser);
     if (!currentUser || currentUser.type !== "eventOrganiser") {
       login("eventOrganiser");
+      console.log("EventOrganiser Layout: Logged in as eventOrganiser");
     }
   }, []);
 

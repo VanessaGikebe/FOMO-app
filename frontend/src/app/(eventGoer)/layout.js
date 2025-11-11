@@ -9,8 +9,10 @@ export default function EventGoerLayout({ children }) {
 
   useEffect(() => {
     // Auto-login as eventGoer for development/testing
+    console.log("EventGoer Layout: Current user:", currentUser);
     if (!currentUser || currentUser.type !== "eventGoer") {
       login("eventGoer");
+      console.log("EventGoer Layout: Logged in as eventGoer");
     }
   }, []);
 

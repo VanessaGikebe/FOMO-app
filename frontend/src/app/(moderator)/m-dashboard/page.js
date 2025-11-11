@@ -1,4 +1,3 @@
-import { Footer } from "@/components";
 
 // Component for the Moderator Metric/Stat Cards
 const MetricCard = ({ title, value, iconPath, iconColor, valueColor }) => (
@@ -198,8 +197,6 @@ export default function ModeratorDashboard() {
         </div>
       </main>
 
-      {/* --- Footer Component --- */}
-      <Footer />
-    </div>
+      {/* --- Footer Component --- */}    </div>
   );
 }

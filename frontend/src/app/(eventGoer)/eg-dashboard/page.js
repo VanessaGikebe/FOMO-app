@@ -1,4 +1,3 @@
-import { Footer } from "@/components";
 
 // --- Utility Components for Reusability ---
 
@@ -119,8 +118,6 @@ export default function EventGoerDashboard() {
         </div>
       </main>
 
-      {/* --- Footer Component --- */}
-      <Footer />
-    </div>
+      {/* --- Footer Component --- */}    </div>
   );
 }

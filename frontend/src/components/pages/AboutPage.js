@@ -1,4 +1,3 @@
-import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 import Link from "next/link";
 
@@ -145,8 +144,6 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

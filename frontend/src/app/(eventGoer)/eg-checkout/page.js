@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/UI Components/Footer";
 import Button from "@/components/UI Components/Button";
 
 export default function CheckoutPage() {
@@ -272,8 +271,6 @@ export default function CheckoutPage() {
             </Button>
           </div>
         </div>
-      </div>
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }

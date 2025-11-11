@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Footer } from "@/components";
 
 export default function PublicHome() {
   return (
@@ -144,8 +143,6 @@ export default function PublicHome() {
           </Link>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

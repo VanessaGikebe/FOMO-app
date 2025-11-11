@@ -6,7 +6,6 @@ import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
 import SearchBar from "../UI Components/SearchBar";
 import EventCard from "../UI Components/EventCard";
-import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 
 export default function EventsPage({ userType = "public" }) {
@@ -140,8 +139,6 @@ export default function EventsPage({ userType = "public" }) {
           )}
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

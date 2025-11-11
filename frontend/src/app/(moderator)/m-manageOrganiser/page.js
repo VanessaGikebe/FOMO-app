@@ -1,6 +1,5 @@
 'use client';
 
-import { Footer } from "@/components";
 import React, { useState, useMemo } from 'react';
 
 // --- Organiser Row Component ---
@@ -214,8 +213,6 @@ export default function ManageOrganisers() {
                 </div>
             </main>
 
-            {/* --- Footer Component --- */}
-            <Footer />
-        </div>
+            {/* --- Footer Component --- */}        </div>
     );
 }

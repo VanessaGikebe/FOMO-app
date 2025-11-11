@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
 import EventForm from "@/components/UI Components/EventForm";
-import { Footer } from "@/components";
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -49,8 +48,6 @@ export default function CreateEventPage() {
             />
           </div>
         </div>
-      </div>
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }

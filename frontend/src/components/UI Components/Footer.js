@@ -1,6 +1,77 @@
+"use client";
+
 import Link from "next/link";
+import { useUser } from "@/contexts/UserContext";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const { currentUser } = useUser();
+  const pathname = usePathname();
+  const [userType, setUserType] = useState("public");
+
+  useEffect(() => {
+    // Determine user type based on the current pathname
+    console.log("Footer: Current pathname:", pathname);
+    
+    if (pathname.startsWith('/eg-')) {
+      setUserType("eventGoer");
+      console.log("Footer: Set userType to eventGoer based on path");
+    } else if (pathname.startsWith('/eo-')) {
+      setUserType("eventOrganiser");
+      console.log("Footer: Set userType to eventOrganiser based on path");
+    } else if (pathname.startsWith('/m-')) {
+      setUserType("moderator");
+      console.log("Footer: Set userType to moderator based on path");
+    } else {
+      setUserType("public");
+      console.log("Footer: Set userType to public based on path");
+    }
+  }, [pathname]); // Update when pathname changes
+
+  // Quick Links based on user type
+  const getQuickLinks = () => {
+    console.log("Footer: Getting quick links for userType:", userType);
+    switch (userType) {
+      case "eventGoer":
+        return [
+          { label: "Dashboard", href: "/eg-dashboard" },
+          { label: "Events", href: "/eg-events" },
+          { label: "My Events", href: "/eg-myEvents" },
+          { label: "Notifications", href: "/eg-notifications" },
+          { label: "Profile", href: "/eg-profile" }
+        ];
+      
+      case "eventOrganiser":
+        return [
+          { label: "Dashboard", href: "/eo-dashboard" },
+          { label: "Manage Events", href: "/eo-manageEvents" },
+          { label: "Profile", href: "/eo-profile" }
+        ];
+      
+      case "moderator":
+        return [
+          { label: "Dashboard", href: "/m-dashboard" },
+          { label: "Manage Events", href: "/m-manageEvent" },
+          { label: "Manage Organisers", href: "/m-manageOrganiser" },
+          { label: "Profile", href: "/m-profile" }
+        ];
+      
+      default: // public
+        return [
+          { label: "Home", href: "/" },
+          { label: "Events", href: "/p-events" },
+          { label: "About", href: "/p-about" },
+          { label: "Sign Up", href: "/signup" },
+          { label: "Log In", href: "/login" }
+        ];
+    }
+  };
+
+  const quickLinks = getQuickLinks();
+
+  console.log("Footer: Rendering with userType:", userType, "links:", quickLinks);
+
   return (
     <footer className="bg-gray-50 border-t border-gray-200 py-12 px-6">
       <div className="max-w-6xl mx-auto">
@@ -17,15 +88,20 @@ export default function Footer() {
             <p className="text-sm text-gray-600">Phone No: 0712345678</p>
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links - Dynamic based on user type */}
           <div>
             <h3 className="font-bold text-gray-900 mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors">Home</Link></li>
-              <li><Link href="/events" className="text-gray-600 hover:text-gray-900 transition-colors">Events</Link></li>
-              <li><Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">About</Link></li>
-              <li><Link href="/signup" className="text-gray-600 hover:text-gray-900 transition-colors">Sign Up</Link></li>
-              <li><Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">Log In</Link></li>
+              {quickLinks.map((link, index) => (
+                <li key={index}>
+                  <Link 
+                    href={link.href} 
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

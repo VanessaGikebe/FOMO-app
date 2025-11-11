@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 
 // Sample user data - in real app, this would come from authentication
@@ -301,8 +300,6 @@ export default function ProfilePage({ userData = sampleUser }) {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

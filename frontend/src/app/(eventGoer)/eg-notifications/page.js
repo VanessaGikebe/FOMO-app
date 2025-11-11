@@ -2,7 +2,6 @@
 
 import { useNotifications } from "@/contexts/NotifContext";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/UI Components/Footer";
 import Button from "@/components/UI Components/Button";
 
 export default function NotificationsPage() {
@@ -65,9 +64,7 @@ export default function NotificationsPage() {
             )}
           </div>
         </div>
-      </div>
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }
 
