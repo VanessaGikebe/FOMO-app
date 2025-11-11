@@ -1,36 +1,50 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 // --- Organiser Row Component ---
-const OrganiserRow = ({ name, email }) => (
-    <div className="w-full bg-white p-4 my-2 border border-gray-200 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between transition hover:shadow-md">
-        
-        {/* Organiser Info */}
-        <div className="flex flex-col md:flex-row md:space-x-8 flex-grow mb-4 md:mb-0">
-            <div className="w-full md:w-1/3 mb-1 md:mb-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
-                <p className="text-xs text-gray-500 md:hidden">Organiser Name</p>
-            </div>
-            <div className="w-full md:w-1/3">
-                <p className="text-sm text-gray-600 truncate">{email}</p>
-                <p className="text-xs text-gray-500 md:hidden">Email Address</p>
-            </div>
-        </div>
+// Added 'id' and 'router' props
+const OrganiserRow = ({ id, name, email, router }) => {
+    
+    // Handler for navigating to the organiser's event list
+    const handleViewEvents = () => {
+        // Navigates to the dynamic route for the specific organiser
+        router.push(`/m-view_organiserEvent/${id}`);
+    };
 
-        {/* Action Buttons */}
-        <div className="flex space-x-3 w-full md:w-auto flex-shrink-0">
-            {/* View Events Button (Dark) */}
-            <button className="flex-1 md:flex-none bg-gray-900 text-white text-sm py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out font-semibold">
-              View Events
-            </button>
-            {/* Flag User Button (Red) */}
-            <button className="flex-1 md:flex-none bg-red-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out font-semibold">
-              Flag User
-            </button>
+    return (
+        <div className="w-full bg-white p-4 my-2 border border-gray-200 rounded-xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between transition hover:shadow-md">
+            
+            {/* Organiser Info */}
+            <div className="flex flex-col md:flex-row md:space-x-8 flex-grow mb-4 md:mb-0">
+                <div className="w-full md:w-1/3 mb-1 md:mb-0">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+                    <p className="text-xs text-gray-500 md:hidden">Organiser Name</p>
+                </div>
+                <div className="w-full md:w-1/3">
+                    <p className="text-sm text-gray-600 truncate">{email}</p>
+                    <p className="text-xs text-gray-500 md:hidden">Email Address</p>
+                </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex space-x-3 w-full md:w-auto flex-shrink-0">
+                {/* View Events Button (Dark) - Now uses the click handler */}
+                <button 
+                    onClick={handleViewEvents}
+                    className="flex-1 md:flex-none bg-gray-900 text-white text-sm py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out font-semibold"
+                >
+                    View Events
+                </button>
+                {/* Flag User Button (Red) */}
+                <button className="flex-1 md:flex-none bg-red-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out font-semibold">
+                    Flag User
+                </button>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 
 // --- Pagination Component ---
@@ -40,27 +54,21 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => 
 
     if (totalPages <= 1) return null;
 
-    // Determine the range of page numbers to display
     let startPage, endPage;
     if (totalPages <= maxPagesToShow) {
-        // Less than maxPagesToShow pages total, show all
         startPage = 1;
         endPage = totalPages;
     } else {
-        // More than maxPagesToShow pages total, calculate start and end pages
         const maxPagesBeforeCurrentPage = Math.floor(maxPagesToShow / 2);
         const maxPagesAfterCurrentPage = Math.ceil(maxPagesToShow / 2) - 1;
         
         if (currentPage <= maxPagesBeforeCurrentPage) {
-            // Near the beginning
             startPage = 1;
             endPage = maxPagesToShow;
         } else if (currentPage + maxPagesAfterCurrentPage >= totalPages) {
-            // Near the end
             startPage = totalPages - maxPagesToShow + 1;
             endPage = totalPages;
         } else {
-            // Somewhere in the middle
             startPage = currentPage - maxPagesBeforeCurrentPage;
             endPage = currentPage + maxPagesAfterCurrentPage;
         }
@@ -125,15 +133,22 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => 
 // --- Main Dashboard Component ---
 
 export default function ManageOrganisers() {
+    const router = useRouter(); // Initialize router
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 10;
     
-    // --- Dummy Data (25 items to test pagination) ---
-    const allOrganisers = useMemo(() => Array.from({ length: 25 }, (_, i) => ({
-        id: i + 1,
-        name: `Organiser Name ${i + 1}`,
-        email: `organiser${i + 1}@example.com`
-    })), []);
+    // Set a small page limit for testing the pagination interface
+    const ITEMS_PER_PAGE = 3; 
+    
+    // --- Dummy Data (Enough for two pages) ---
+    const allOrganisers = useMemo(() => [
+        { id: "global-tech", name: "Global Tech Co.", email: "tech@global.com" },
+        { id: "art-space", name: "City Art Space", email: "art@city.org" },
+        { id: "food-trucks", name: "Gourmet Food Trucks", email: "gourmet@trucks.net" },
+        { id: "fitness-pro", name: "Fitness Pros Inc.", email: "admin@fitness.com" },
+        { id: "local-band", name: "The Local Band", email: "band@music.live" },
+        { id: "health-plus", name: "Health Plus Clinic", email: "clinic@health.net" },
+        // { id: "test-user", name: "Another Organizer", email: "test@org.com" }, // Uncomment for a third page
+    ], []);
     // const allOrganisers = []; // Uncomment this line to test the "Empty State"
 
     // Calculate current items to display
@@ -144,7 +159,11 @@ export default function ManageOrganisers() {
     }, [allOrganisers, currentPage, ITEMS_PER_PAGE]);
 
     const handlePageChange = (page) => {
-        setCurrentPage(page);
+        // Ensure page stays within bounds
+        const totalPages = Math.ceil(allOrganisers.length / ITEMS_PER_PAGE);
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
     };
 
     return (
@@ -195,14 +214,16 @@ export default function ManageOrganisers() {
                             {currentOrganisers.map(organiser => (
                                 <OrganiserRow 
                                     key={organiser.id}
+                                    id={organiser.id} // Pass the ID
                                     name={organiser.name}
                                     email={organiser.email}
+                                    router={router} // Pass the router instance
                                 />
                             ))}
                         </div>
                     )}
                     
-                    {/* Pagination */}
+                    {/* Pagination - This is the corrected and integrated component */}
                     <Pagination
                         totalItems={allOrganisers.length}
                         itemsPerPage={ITEMS_PER_PAGE}
@@ -213,6 +234,6 @@ export default function ManageOrganisers() {
                 </div>
             </main>
 
-            {/* --- Footer Component --- */}        </div>
+        </div>
     );
-}
+} 
