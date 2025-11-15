@@ -1,30 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as admin from 'firebase-admin';
-import * as dotenv from 'dotenv';
-import { join } from 'path';
-import * as fs from 'fs';
+import * as dotenv from "dotenv";
+// Ensure firebase-admin is initialized early using our runtime loader.
+// This module performs credential resolution (env, path, local file, ADC)
+import "./firebase/firebase.config";
 
 
 async function bootstrap() {
   dotenv.config();
 
-  // Load service account key from backend root
-  try {
-    const keyPath = join(__dirname, '../serviceAccountKey.json');
-    if (fs.existsSync(keyPath)) {
-      const serviceAccount = JSON.parse(fs.readFileSync(keyPath, 'utf-8'));
-      if (!admin.apps.length) {
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-        });
-      }
-    } else {
-      console.warn('serviceAccountKey.json not found at', keyPath);
-    }
-  } catch (err) {
-    console.error('Failed to initialize Firebase:', err);
-  }
+  // Early initialization is handled by imported module `./firebase/firebase.config`.
+  // Keep this area clean; that module already tries env/path/local/ADC fallbacks.
 
   const app = await NestFactory.create(AppModule);
   app.enableCors();
@@ -33,4 +19,4 @@ async function bootstrap() {
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
-bootstrap();
+void bootstrap();

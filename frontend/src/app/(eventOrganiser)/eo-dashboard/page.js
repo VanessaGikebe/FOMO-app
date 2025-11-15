@@ -1,4 +1,11 @@
+"use client";
+
 import { Footer } from "@/components";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEvents } from '@/contexts/EventsContext';
+import { useUser } from '@/contexts/UserContext';
+import EventCardComponent from '@/components/UI Components/EventCard';
 
 // --- Utility Components ---
 
@@ -67,8 +74,8 @@ const EventCard = ({ category = "Technology", title = "Event Title", venueDate =
 );
 
 // Component for Quick Action Buttons
-const QuickActionButton = ({ title, iconPath }) => (
-  <button className="w-full sm:w-1/4 p-2 flex-shrink-0">
+const QuickActionButton = ({ title, iconPath, onClick }) => (
+  <button onClick={onClick} className="w-full sm:w-1/4 p-2 flex-shrink-0">
     <div className="bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center justify-center transition duration-150 ease-in-out h-32">
       {/* Icon */}
       <div className="bg-gray-300 rounded-full p-2 mb-2">
@@ -86,13 +93,17 @@ const QuickActionButton = ({ title, iconPath }) => (
 // --- Main Dashboard Component ---
 
 export default function EventOrganiserDashboard() {
-  // Dummy data for upcoming events
-  const upcomingEvents = [
-    { category: "Technology", title: "Tech Summit 2025" },
-    { category: "Music", title: "Live Music Gala" },
-    { category: "Food & Drink", title: "Gourmet Food Fair" },
-  ];
+  const { getEventsByOrganizer, events } = useEvents();
+  const { getUserId } = useUser();
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const router = useRouter();
 
+  useEffect(() => {
+    const uid = getUserId();
+    if (!uid) return;
+    const list = getEventsByOrganizer(uid) || [];
+    setUpcomingEvents(list);
+  }, [events, getUserId]);
   return (
     <div className="min-h-screen bg-gray-50">
       
@@ -135,13 +146,18 @@ export default function EventOrganiserDashboard() {
             <p className="text-gray-600 mb-6">Review scheduled events to refine marketing and update key details</p>
             
             <div className="flex flex-wrap -m-2">
-              {upcomingEvents.map((event, index) => (
-                <EventCard 
-                  key={index} 
-                  category={event.category}
-                  title={event.title}
-                />
-              ))}
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.map((event) => (
+                  <EventCardComponent 
+                    key={event.id}
+                    event={event}
+                    userType="eventOrganiser"
+                    userId={getUserId()}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 p-4">No upcoming events yet.</p>
+              )}
             </div>
           </section>
           
@@ -154,22 +170,26 @@ export default function EventOrganiserDashboard() {
               {/* View Events: Eye Icon */}
               <QuickActionButton 
                 title="View Events" 
-                iconPath="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" // Eye Icon
+                iconPath="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                onClick={() => router.push('/p-events')}
               />
               {/* Create Event: Plus Icon */}
               <QuickActionButton 
                 title="Create Event" 
                 iconPath="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" 
+                onClick={() => router.push('/eo-create_event_page')}
               />
               {/* Edit Event: Pencil Icon */}
               <QuickActionButton 
                 title="Edit Event" 
                 iconPath="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-9-9h5m-5 0a2 2 0 00-2 2v5m2-5h5m-5 0L19 7" 
+                onClick={() => router.push('/eo-manageEvents')}
               />
               {/* Delete Event: Trash Icon */}
               <QuickActionButton 
                 title="Delete Event" 
                 iconPath="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
+                onClick={() => router.push('/eo-manageEvents')}
               />
             </div>
           </section>

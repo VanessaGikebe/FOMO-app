@@ -1,145 +1,93 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { collection, onSnapshot, getDocs, addDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../lib/firebaseClient';
 
 const EventsContext = createContext();
 
-// Mock events data
-const initialEvents = [
-  {
-    id: "evt001",
-    title: "Tech Summit 2025",
-    description: "Join us for the biggest tech conference of the year featuring industry leaders, cutting-edge innovations, and networking opportunities.",
-    category: "Technology",
-  // Temporarily set to today for testing notifications
-  date: "2025-11-01",
-    time: "09:00 AM",
-    location: "Nairobi Convention Centre",
-    price: 2500,
-    image: null,
-    organizerId: "org001",
-    organizerName: "Tech Events Kenya",
-    isFlagged: false,
-    flagReason: "",
-    attendees: 342,
-    capacity: 500,
-    tags: ["Technology", "Networking", "Innovation"]
-  },
-  {
-    id: "evt002",
-    title: "Jazz Night Live",
-    description: "An evening of smooth jazz featuring local and international artists. Enjoy great music, food, and drinks.",
-    category: "Music",
-  // Temporarily set to tomorrow for testing notifications
-  date: "2025-11-02",
-    time: "07:00 PM",
-    location: "The Alchemist Bar",
-    price: 1500,
-    image: null,
-    organizerId: "org002",
-    organizerName: "Live Music Productions",
-    isFlagged: false,
-    flagReason: "",
-    attendees: 89,
-    capacity: 150,
-    tags: ["Music", "Jazz", "Entertainment"]
-  },
-  {
-    id: "evt003",
-    title: "Food Festival Nairobi",
-    description: "Celebrate culinary diversity with over 50 food vendors, cooking demonstrations, and live entertainment.",
-    category: "Food & Drink",
-    date: "2025-12-01",
-    time: "11:00 AM",
-    location: "Uhuru Gardens",
-    price: 500,
-    image: null,
-    organizerId: "org001",
-    organizerName: "Tech Events Kenya",
-    isFlagged: false,
-    flagReason: "",
-    attendees: 567,
-    capacity: 1000,
-    tags: ["Food", "Festival", "Family Friendly"]
-  },
-  {
-    id: "evt004",
-    title: "Startup Pitch Competition",
-    description: "Watch innovative startups pitch their ideas to top investors. Network with entrepreneurs and VCs.",
-    category: "Business",
-    date: "2025-11-25",
-    time: "02:00 PM",
-    location: "iHub Nairobi",
-    price: 1000,
-    image: null,
-    organizerId: "org003",
-    organizerName: "Startup Hub",
-    isFlagged: true,
-    flagReason: "Pending verification of event details",
-    attendees: 45,
-    capacity: 100,
-    tags: ["Business", "Startups", "Networking"]
-  },
-  {
-    id: "evt005",
-    title: "Yoga in the Park",
-    description: "Join us for a relaxing morning of yoga, meditation, and wellness activities in beautiful surroundings.",
-    category: "Sports & Wellness",
-    date: "2025-11-18",
-    time: "06:30 AM",
-    location: "Karura Forest",
-    price: 0,
-    image: null,
-    organizerId: "org004",
-    organizerName: "Wellness Warriors",
-    isFlagged: false,
-    flagReason: "",
-    attendees: 23,
-    capacity: 50,
-    tags: ["Wellness", "Yoga", "Outdoor", "Free"]
-  },
-  {
-    id: "evt006",
-    title: "Art Exhibition: Modern Africa",
-    description: "Explore contemporary African art from emerging and established artists. Opening reception with artist talks.",
-    category: "Arts & Culture",
-    date: "2025-12-05",
-    time: "05:00 PM",
-    location: "Nairobi National Museum",
-    price: 800,
-    image: null,
-    organizerId: "org002",
-    organizerName: "Live Music Productions",
-    isFlagged: false,
-    flagReason: "",
-    attendees: 112,
-    capacity: 200,
-    tags: ["Art", "Culture", "Exhibition"]
-  }
-];
+// Start with no hard-coded events. Frontend will load events from Firestore in realtime.
+const initialEvents = [];
 
 export function EventsProvider({ children }) {
   // Load events; start with built-in data on the server and hydrate on client.
   const [events, setEvents] = useState(initialEvents);
 
-  // Load saved events on client mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const savedEvents = localStorage.getItem('fomo_events');
-      if (savedEvents) {
-        setEvents(JSON.parse(savedEvents));
-      }
-    } catch (error) {
-      console.error('Error parsing saved events:', error);
-    }
-  }, []);
+  // Subscribe to Firestore `events` collection on client mount. If Firestore is unreachable
+  // we keep the initialEvents/local changes as a fallback.
+  // Helper to normalize event documents coming from various sources
+  const normalizeEvent = (docId, data = {}) => {
+    // prefer explicit ids, fall back to docId
+    const id = docId || data.id || data.event_id || data.eventId || '';
+    const title = data.title || data.name || '';
+    const description = data.description || data.details || '';
+    const category = data.category || data.category_name || '';
+    const price = (data.price !== undefined) ? data.price : (data.price_paid !== undefined ? data.price_paid : 0);
+    const capacity = data.capacity ?? data.max_capacity ?? 0;
+    const attendees = data.attendees ?? data.attendee_count ?? 0;
 
-  // Persist events to localStorage (client-side)
+    // date/time normalization: support separate fields or a Firestore Timestamp (start_date)
+    let date = data.date || '';
+    let time = data.time || '';
+    if (data.start_date) {
+      try {
+        const d = (typeof data.start_date.toDate === 'function') ? data.start_date.toDate() : new Date(data.start_date);
+        date = d.toISOString().split('T')[0];
+        // show HH:MM
+        const hhmm = d.toTimeString().split(' ')[0].slice(0,5);
+        time = hhmm;
+      } catch (e) {
+        // ignore and keep existing date/time values
+      }
+    }
+
+    const location = data.location || data.venue || data.venue_name || '';
+    const organizerId = data.organizerId || data.organizer_id || data.user_id || data.userId || '';
+    const organizerName = data.organizerName || data.organizer_name || data.organizer || '';
+    const image = data.image || data.image_url || null;
+    const isFlagged = data.isFlagged ?? data.is_flagged ?? false;
+    const flagReason = data.flagReason ?? data.flag_reason ?? '';
+    const tags = data.tags || [];
+
+    return {
+      id,
+      title,
+      description,
+      category,
+      date,
+      time,
+      location,
+      price,
+      image,
+      organizerId,
+      organizerName,
+      isFlagged,
+      flagReason,
+      attendees,
+      capacity,
+      tags,
+      // keep raw for debugging or advanced UI needs
+      _raw: data,
+    };
+  };
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem('fomo_events', JSON.stringify(events));
-  }, [events]);
+    const col = collection(db, 'events');
+    let unsub = () => {};
+    try {
+      unsub = onSnapshot(col, (snapshot) => {
+        const docs = snapshot.docs.map(d => normalizeEvent(d.id, d.data()));
+        setEvents(docs);
+      }, (err) => {
+        console.error('Failed to listen to events collection:', err);
+      });
+    } catch (err) {
+      console.warn('Realtime events subscription failed, falling back to local data:', err);
+      // keep initialEvents
+    }
+    return () => unsub();
+  }, []);
 
   // Get all events (with optional filtering for non-flagged)
   const getAllEvents = (includesFlagged = true) => {
@@ -159,56 +107,106 @@ export function EventsProvider({ children }) {
     return events.filter(event => event.organizerId === organizerId);
   };
 
-  // Create new event
-  const createEvent = (eventData) => {
-    const newEvent = {
-      id: `evt${String(events.length + 1).padStart(3, '0')}`,
-      ...eventData,
-      isFlagged: false,
-      flagReason: "",
-      attendees: 0,
-      createdAt: new Date().toISOString()
-    };
-    setEvents(prevEvents => [...prevEvents, newEvent]);
-    return newEvent;
+  // Create new event (writes to Firestore). Returns created event object.
+  const createEvent = async (eventData) => {
+    try {
+      const payload = {
+        ...eventData,
+        isFlagged: false,
+        flagReason: "",
+        attendees: 0,
+        createdAt: serverTimestamp()
+      };
+      const ref = await addDoc(collection(db, 'events'), payload);
+
+      // ensure we also set canonical fields used elsewhere (event_id, organizer_id)
+      const organizerIdValue = payload.organizerId || payload.organizer_id || null;
+      await setDoc(doc(db, 'events', ref.id), { event_id: ref.id, organizer_id: organizerIdValue }, { merge: true });
+
+      // Build a normalized created object to return immediately; onSnapshot will sync canonical data
+      const createdRaw = { ...payload, event_id: ref.id, organizer_id: organizerIdValue };
+      const created = normalizeEvent(ref.id, createdRaw);
+      return created;
+    } catch (err) {
+      console.error('Failed to create event in Firestore, falling back to local create:', err);
+      const newEvent = {
+        id: `evt${String(events.length + 1).padStart(3, '0')}`,
+        ...eventData,
+        isFlagged: false,
+        flagReason: "",
+        attendees: 0,
+        createdAt: new Date().toISOString()
+      };
+      setEvents(prevEvents => [...prevEvents, newEvent]);
+      return newEvent;
+    }
   };
 
-  // Update existing event
-  const updateEvent = (eventId, updatedData) => {
-    setEvents(prevEvents => 
-      prevEvents.map(event => 
-        event.id === eventId 
-          ? { ...event, ...updatedData, updatedAt: new Date().toISOString() }
-          : event
-      )
-    );
+  // Update existing event (writes to Firestore)
+  const updateEvent = async (eventId, updatedData) => {
+    try {
+      const ref = doc(db, 'events', eventId);
+      await updateDoc(ref, { ...updatedData, updatedAt: serverTimestamp() });
+      return true;
+    } catch (err) {
+      console.error('Failed to update event in Firestore, applying local patch:', err);
+      setEvents(prevEvents => 
+        prevEvents.map(event => 
+          event.id === eventId 
+            ? { ...event, ...updatedData, updatedAt: new Date().toISOString() }
+            : event
+        )
+      );
+      return false;
+    }
   };
 
-  // Delete event
-  const deleteEvent = (eventId) => {
-    setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+  // Delete event (Firestore)
+  const deleteEvent = async (eventId) => {
+    try {
+      await deleteDoc(doc(db, 'events', eventId));
+      return true;
+    } catch (err) {
+      console.error('Failed to delete event from Firestore, removing locally:', err);
+      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+      return false;
+    }
   };
 
   // Flag event (moderator only)
-  const flagEvent = (eventId, reason = "") => {
-    setEvents(prevEvents => 
-      prevEvents.map(event => 
-        event.id === eventId 
-          ? { ...event, isFlagged: true, flagReason: reason }
-          : event
-      )
-    );
+  const flagEvent = async (eventId, reason = "") => {
+    try {
+      await updateDoc(doc(db, 'events', eventId), { isFlagged: true, flagReason: reason });
+      return true;
+    } catch (err) {
+      console.error('Failed to flag event in Firestore, applying locally:', err);
+      setEvents(prevEvents => 
+        prevEvents.map(event => 
+          event.id === eventId 
+            ? { ...event, isFlagged: true, flagReason: reason }
+            : event
+        )
+      );
+      return false;
+    }
   };
 
   // Unflag event (moderator only)
-  const unflagEvent = (eventId) => {
-    setEvents(prevEvents => 
-      prevEvents.map(event => 
-        event.id === eventId 
-          ? { ...event, isFlagged: false, flagReason: "" }
-          : event
-      )
-    );
+  const unflagEvent = async (eventId) => {
+    try {
+      await updateDoc(doc(db, 'events', eventId), { isFlagged: false, flagReason: "" });
+      return true;
+    } catch (err) {
+      console.error('Failed to unflag event in Firestore, applying locally:', err);
+      setEvents(prevEvents => 
+        prevEvents.map(event => 
+          event.id === eventId 
+            ? { ...event, isFlagged: false, flagReason: "" }
+            : event
+        )
+      );
+      return false;
+    }
   };
 
   // Check if user owns event

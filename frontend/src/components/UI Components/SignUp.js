@@ -1,31 +1,70 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { auth, db } from '../../lib/firebaseClient';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getDashboardForRole } from '@/utils/roleHelpers';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+function mapLabelToRole(label) {
+  const s = String(label || '').toLowerCase();
+  if (s.includes('organis') || s.includes('organizer') || s.includes('event organiser') || s.includes('event_organiser')) return 'Event Organiser';
+  if (s.includes('moderator') || s.includes('mod')) return 'moderator';
+  return 'Experience Seeker';
+}
 
 export default function SignUp() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [label, setLabel] = useState('experience_seeker'); 
+  const [label, setLabel] = useState('Experience Seeker'); 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-        console.error("Passwords do not match.");
-        // In a real app, you would show a user-friendly error message in the UI
-        return; 
+      console.error('Passwords do not match.');
+      return;
     }
     setIsLoading(true);
-    console.log('Attempting sign up:', { fullName, email, label });
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = cred.user.uid;
+      const role = mapLabelToRole(label);
 
-    // Simulate API call delay
-    setTimeout(() => {
-        setIsLoading(false);
-        console.log('Sign up attempt finished.');
-    }, 1500);
+      // Create Firestore user doc
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        fullName: fullName || cred.user.displayName || '',
+        email: email,
+        role,
+        createdAt: serverTimestamp(),
+      });
+
+      // Optionally sync with backend (upsert)
+      try {
+        const idToken = await cred.user.getIdToken();
+        await fetch(`${API_URL}/auth/upsert`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+      } catch (err) {
+        console.warn('Failed to call backend /auth/upsert:', err);
+      }
+
+      // After signup, sign out and redirect to sign-in so user can log in
+      await signOut(auth);
+      router.push('/signin');
+    } catch (err) {
+      console.error('Sign up failed', err);
+      setIsLoading(false);
+    }
   };
   
   // Base classes for consistent input/select styling
@@ -103,8 +142,8 @@ export default function SignUp() {
               // Custom styles applied: mt-1 for margin, bg-white, and consistent input styling
               className="mt-1 h-10 w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors"
             >
-                <option value="experience_seeker">Experience Seeker</option>
-                <option value="event_organiser">Event Organiser</option>
+                <option value="Experience Seeker">Experience Seeker</option>
+                <option value="Event Organiser">Event Organiser</option>
                 <option value="moderator">Moderator</option>
             </select>
           </div>

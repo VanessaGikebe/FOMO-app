@@ -1,113 +1,89 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth, db } from '../lib/firebaseClient';
+import { doc, getDoc } from 'firebase/firestore';
+import { roleToType } from '@/lib/roleUtils';
 
 const UserContext = createContext();
 
-// Mock users data - in production, this would come from authentication
-const mockUsers = {
-  public: null, // Not logged in
-  eventGoer: {
-    id: "user001",
-    name: "John Doe",
-    email: "john@example.com",
-    type: "eventGoer",
-    favorites: [],
-    cart: []
-  },
-  eventOrganiser: {
-    id: "org001",
-    name: "Tech Events Kenya",
-    email: "info@techevents.co.ke",
-    type: "eventOrganiser"
-  },
-  moderator: {
-    id: "mod001",
-    name: "Sarah Admin",
-    email: "admin@fomo.co.ke",
-    type: "moderator"
-  }
-};
-
 export function UserProvider({ children }) {
-  // Load current user from localStorage on client mount (SSR-safe)
   const [currentUser, setCurrentUser] = useState(null);
 
-  // Load saved user on client mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    try {
-      const savedUser = localStorage.getItem('fomo_current_user');
-      if (savedUser) {
-        setCurrentUser(JSON.parse(savedUser));
+
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      if (!fbUser) {
+        setCurrentUser(null);
+        return;
       }
-    } catch (error) {
-      console.error('Error parsing saved user:', error);
-    }
+
+      try {
+        const userRef = doc(db, 'users', fbUser.uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          setCurrentUser({
+            uid: fbUser.uid,
+            email: data.email || fbUser.email,
+            name: data.fullName || fbUser.displayName || '',
+            role: data.role || null,
+            type: roleToType(data.role),
+            raw: data,
+          });
+        } else {
+          // no firestore doc; fallback to minimal info
+          setCurrentUser({ uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName, type: 'public' });
+        }
+      } catch (err) {
+        console.error('Failed to load user doc from Firestore', err);
+        setCurrentUser({ uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName, type: 'public' });
+      }
+    });
+
+    return () => unsub();
   }, []);
 
-  // Persist currentUser to localStorage (client-side)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (currentUser) {
-      localStorage.setItem('fomo_current_user', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('fomo_current_user');
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setCurrentUser(null);
+    } catch (err) {
+      console.error('Sign out failed', err);
     }
-  }, [currentUser]);
-
-  const login = (userType) => {
-    setCurrentUser(mockUsers[userType]);
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-  };
 
-  const isAuthenticated = () => {
-    return currentUser !== null;
-  };
+  const isAuthenticated = () => currentUser !== null;
+  const getUserType = () => currentUser?.type || 'public';
+  const getUserId = () => currentUser?.uid || null;
 
-  const getUserType = () => {
-    return currentUser?.type || "public";
-  };
-
-  const getUserId = () => {
-    return currentUser?.id || null;
-  };
-
-  // Add event to favorites (eventGoer only)
+  // Favorites helpers operate on the in-memory currentUser object.
   const addToFavorites = (eventId) => {
-    if (currentUser?.type === "eventGoer") {
-      setCurrentUser(prev => ({
-        ...prev,
-        favorites: [...new Set([...prev.favorites, eventId])]
-      }));
-    }
+    setCurrentUser((prev) => {
+      if (!prev) return prev;
+      const favs = prev.favorites || [];
+      if (favs.includes(eventId)) return prev;
+      const updated = { ...prev, favorites: [...favs, eventId] };
+      return updated;
+    });
   };
 
-  // Remove from favorites
   const removeFromFavorites = (eventId) => {
-    if (currentUser?.type === "eventGoer") {
-      setCurrentUser(prev => ({
-        ...prev,
-        favorites: prev.favorites.filter(id => id !== eventId)
-      }));
-    }
+    setCurrentUser((prev) => {
+      if (!prev) return prev;
+      const favs = prev.favorites || [];
+      const updated = { ...prev, favorites: favs.filter((f) => f !== eventId) };
+      return updated;
+    });
   };
 
-  // Check if event is in favorites
-  const isFavorite = (eventId) => {
-    return currentUser?.favorites?.includes(eventId) || false;
-  };
-
-  // Add to cart (eventGoer only)
-  // NOTE: Cart is managed in EventsContext. Legacy user-level cart functions
-  // were removed to avoid duplicate sources of truth.
+  const isFavorite = (eventId) => (currentUser?.favorites || []).includes(eventId);
 
   const value = {
     currentUser,
-    login,
     logout,
     isAuthenticated,
     getUserType,
@@ -115,20 +91,15 @@ export function UserProvider({ children }) {
     addToFavorites,
     removeFromFavorites,
     isFavorite,
-    // legacy cart functions removed; use EventsContext for cart operations
   };
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
+    throw new Error('useUser must be used within a UserProvider');
   }
   return context;
 }
