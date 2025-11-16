@@ -78,13 +78,8 @@ export default function EventsPage({ userType = "public" }) {
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#FF6B35]">
             {getPageTitle()}
           </h1>
-<<<<<<< HEAD
           <p className="text-xl text-gray-800 mb-8 font-medium">
             {userType === "eventOrganiser" 
-=======
-          <p className="text-xl text-gray-300 mb-8">
-            {userType === "eventOrganiser"
->>>>>>> 113ed2b (Improved frontend UI with icons)
               ? "View and manage all events on the platform"
               : userType === "moderator"
               ? "Monitor and moderate all events"
@@ -107,14 +102,7 @@ export default function EventsPage({ userType = "public" }) {
           {userType === "eventOrganiser" && (
             <div className="mb-8">
               <Link href="/eo-create_event_page">
-<<<<<<< HEAD
                 <Button variant="primary" className="shadow-lg hover:shadow-xl">
-=======
-                <Button
-                  variant="primary"
-                  className="bg-black text-white hover:bg-gray-800"
-                >
->>>>>>> 113ed2b (Improved frontend UI with icons)
                   + Create New Event
                 </Button>
               </Link>
@@ -146,16 +134,10 @@ export default function EventsPage({ userType = "public" }) {
               ))}
             </div>
           ) : (
-<<<<<<< HEAD
-            <div className="text-center py-16 bg-white/50 rounded-xl backdrop-blur-sm border-2 border-purple-200">
-              <span className="text-6xl mb-4 block">🔍</span>
-              <p className="text-gray-600 text-lg font-medium">No events found. Try adjusting your filters.</p>
-=======
             <div className="text-center py-16">
               <p className="text-gray-500 text-lg">
                 No events found. Try adjusting your filters.
               </p>
->>>>>>> 113ed2b (Improved frontend UI with icons)
             </div>
           )}
         </div>

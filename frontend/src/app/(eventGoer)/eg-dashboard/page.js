@@ -1,13 +1,8 @@
 "use client";
 
-<<<<<<< HEAD
-import { useEvents } from '@/contexts/EventsContext';
-import EventCardComponent from '@/components/UI Components/EventCard';
-=======
 import { Footer } from "@/components";
 import { useEvents } from "@/contexts/EventsContext";
 import EventCardComponent from "@/components/UI Components/EventCard";
->>>>>>> 113ed2b (Improved frontend UI with icons)
 
 export default function EventGoerDashboard() {
   const { getAllEvents } = useEvents();
@@ -64,6 +59,7 @@ export default function EventGoerDashboard() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
