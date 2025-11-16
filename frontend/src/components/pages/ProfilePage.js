@@ -5,19 +5,16 @@ import { useUser } from "@/contexts/UserContext";
 import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 
-// Default user data fallback
+// Default user data fallback - only essential fields from Firebase
 const defaultUser = {
   name: "Guest User",
   email: "guest@example.com",
-  phone: "+254 712 345 678",
-  bio: "Event enthusiast and music lover. Always looking for the next great experience!",
+  phone: "",
+  bio: "",
   avatar: null,
   joinedDate: "January 2024",
-  location: "Nairobi, Kenya",
-  interests: ["Music", "Technology", "Food & Drink", "Sports"],
-  eventsAttended: 15,
-  upcomingEvents: 3,
-  favoriteEvents: 8
+  location: "",
+  interests: []
 };
 
 export default function ProfilePage() {
@@ -124,20 +121,20 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Profile Stats */}
+      {/* Profile Stats - Placeholder for real data from Firestore */}
       <section className="py-8 px-6 bg-white border-b">
         <div className="max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <p className="text-4xl font-bold text-gray-900">{formData.eventsAttended}</p>
+              <p className="text-4xl font-bold text-gray-900">0</p>
               <p className="text-gray-600 mt-2">Events Attended</p>
             </div>
             <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <p className="text-4xl font-bold text-gray-900">{formData.upcomingEvents}</p>
+              <p className="text-4xl font-bold text-gray-900">0</p>
               <p className="text-gray-600 mt-2">Upcoming Events</p>
             </div>
             <div className="text-center p-6 bg-gray-50 rounded-xl">
-              <p className="text-4xl font-bold text-gray-900">{formData.favoriteEvents}</p>
+              <p className="text-4xl font-bold text-gray-900">0</p>
               <p className="text-gray-600 mt-2">Favorite Events</p>
             </div>
           </div>
