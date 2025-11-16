@@ -107,11 +107,11 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Value Card 1 */}
-            <div className="bg-gray-200 rounded-lg p-8 text-center">
-              <div className="w-12 h-12 bg-gray-400 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="bg-white rounded-xl p-8 text-center shadow-sm">
+              <div className="w-12 h-12 bg-[#FF6B35] rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Users className="text-white w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-[#FF6B35] mb-3">
                 Community
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
@@ -122,11 +122,11 @@ export default function AboutPage() {
             </div>
 
             {/* Value Card 2 */}
-            <div className="bg-gray-200 rounded-lg p-8 text-center">
-              <div className="w-12 h-12 bg-gray-400 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="bg-white rounded-xl text-center p-8 shadow-sm">
+              <div className="w-12 h-12 bg-[#FF6B35] rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Compass className="text-white w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-[#FF6B35] mb-3">
                 Discovery
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
@@ -136,11 +136,11 @@ export default function AboutPage() {
             </div>
 
             {/* Value Card 3 */}
-            <div className="bg-gray-200 rounded-lg p-8 text-center">
-              <div className="w-12 h-12 bg-gray-400 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="bg-white rounded-xl text-center p-8 shadow-sm">
+              <div className="w-12 h-12 bg-[#FF6B35] rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Globe className="text-white w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-[#FF6B35] mb-3">
                 Accessibility
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">
@@ -153,7 +153,7 @@ export default function AboutPage() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-20 px-6 bg-gray-200">
+      <section className="py-20 px-6 bg-gradient-to-br from-purple-100 via-orange-50 to-teal-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Get Started with FOMO
@@ -165,7 +165,7 @@ export default function AboutPage() {
           <Link href="/signup">
             <Button
               variant="primary"
-              className="bg-black text-white hover:bg-gray-800"
+              className="bg-[#FF6B35] text-white hover:bg-gray-800"
             >
               Get Started
             </Button>
