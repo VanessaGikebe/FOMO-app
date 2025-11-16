@@ -212,11 +212,12 @@ export async function createOrganizerEvent(eventData, authToken = null) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/events`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(eventData),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/events`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(eventData),
+    });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: response.statusText }));
