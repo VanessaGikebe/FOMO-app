@@ -162,7 +162,8 @@ export default function SignIn() {
           <button
             type="button"
             onClick={handleGoogle}
-            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all`}
+            disabled={isLoading}
+            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">
               <path

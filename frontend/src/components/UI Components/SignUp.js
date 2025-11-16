@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
-import { auth, db } from '../../lib/firebaseClient';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
+import { auth, db, googleProvider } from '../../lib/firebaseClient';
+import { doc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { getDashboardForRole } from '@/utils/roleHelpers';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -63,6 +63,52 @@ export default function SignUp() {
       router.push('/signin');
     } catch (err) {
       console.error('Sign up failed', err);
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignUp = async () => {
+    setIsLoading(true);
+    try {
+      // Sign in with Google
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const uid = user.uid;
+
+      // Check if user doc already exists
+      const userRef = doc(db, 'users', uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        // First time login - create user doc with default role "Experience Seeker"
+        await setDoc(userRef, {
+          fullName: user.displayName || '',
+          email: user.email || '',
+          role: 'Experience Seeker', // Default role for OAuth users
+          createdAt: serverTimestamp(),
+        });
+        console.log('Created new user doc for Google auth');
+      } else {
+        console.log('User already exists, skipping doc creation');
+      }
+
+      // Optionally sync with backend
+      try {
+        const idToken = await user.getIdToken();
+        await fetch(`${API_URL}/auth/upsert`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+      } catch (err) {
+        console.warn('Failed to call backend /auth/upsert:', err);
+      }
+
+      // Redirect to dashboard
+      const role = userSnap.exists() ? userSnap.data().role : 'Experience Seeker';
+      const dashboard = getDashboardForRole(role);
+      router.push(dashboard);
+    } catch (err) {
+      console.error('Google sign up failed', err);
       setIsLoading(false);
     }
   };
@@ -220,8 +266,10 @@ export default function SignUp() {
           {/* Continue With Google Button (Google logo black) */}
           <button
             type="button"
+            onClick={handleGoogleSignUp}
+            disabled={isLoading}
             // Inlined base styles + outline variant styles
-            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all`}
+            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {/* Google Logo SVG - Set to text-foreground (black) */}
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">
