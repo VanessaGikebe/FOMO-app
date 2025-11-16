@@ -107,8 +107,8 @@ export default function SignIn() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 flex items-center justify-center p-4 font-sans">
       <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-purple-200 shadow-xl">
         <div className="flex flex-col items-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded-xl flex items-center justify-center">
-                <span className="text-3xl">📸</span>
+            <div className="w-32 h-32 rounded-xl flex items-center justify-center">
+                <img src="/FOMO LOGO.png" alt="FOMO Logo" className="w-32 h-32 object-contain"/>
             </div>
             <h1 className="text-[#FF6B35] text-4xl mt-3 font-bold">FOMO</h1>
         </div>

@@ -75,8 +75,9 @@ export default function Navbar({ userType = "public" }) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-              <ImageIcon className="w-5 h-5 text-gray-600" />
+            <div className="w-15 h-15 rounded flex items-center justify-center">
+              {/* <ImageIcon className="w-5 h-5 text-gray-600" /> */}
+              <img src="/FOMO LOGO.png" alt="FOMO Logo" className="w-15 h-15 object-contain"/>
             </div>
             <span className="text-xl font-bold text-[#FF6B35]">
               {config.logo}
