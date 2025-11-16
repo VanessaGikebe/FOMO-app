@@ -41,6 +41,21 @@ export class EventsService {
     return event;
   }
 
+  async getEventsByOrganizer(organizerId: string) {
+    const snapshot = await this.db.collection('events')
+      .where('organizerId', '==', organizerId)
+      .get();
+    
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        isSoldOut: (data.attendeeCount ?? 0) >= (data.capacity ?? 0)
+      };
+    });
+  }
+
   async updateEvent(id: string, updateData: any) {
     const eventRef = this.db.collection('events').doc(id);
     const doc = await eventRef.get();
@@ -467,5 +482,56 @@ export class EventsService {
       .get();
 
     return !favQuery.empty;
+  }
+
+  // ============ EVENT METRICS ============
+
+  async getEventMetrics(eventId: string) {
+    // Get event details
+    const eventDoc = await this.db.collection('events').doc(eventId).get();
+    if (!eventDoc.exists) {
+      throw new NotFoundException(`Event with ID ${eventId} not found`);
+    }
+
+    const eventData = eventDoc.data();
+
+    // Get all orders for this event
+    const ordersSnapshot = await this.db.collection('orders')
+      .where('eventId', '==', eventId)
+      .get();
+
+    let totalTicketsSold = 0;
+    let totalRevenue = 0;
+
+    ordersSnapshot.docs.forEach((doc) => {
+      const orderData = doc.data();
+      totalTicketsSold += orderData.quantity || 0;
+      totalRevenue += (orderData.totalPrice || 0);
+    });
+
+    // Calculate visits (assuming page views tracked, defaulting to attendees if available)
+    // In a real scenario, this would come from analytics service
+    const totalVisits = Math.max(
+      eventData.pageViews || 0,
+      (eventData.attendeeCount || 0) * 2 // Estimate: roughly 2 page views per attendee
+    );
+
+    // Calculate conversion rate
+    const conversionRate = totalVisits > 0 
+      ? Math.round((totalTicketsSold / totalVisits) * 100)
+      : 0;
+
+    return {
+      eventId,
+      eventTitle: eventData.title,
+      totalVisits,
+      totalTicketsSold,
+      totalRevenue,
+      conversionRate,
+      capacity: eventData.capacity || 0,
+      attendeeCount: eventData.attendeeCount || 0,
+      isSoldOut: (eventData.attendeeCount || 0) >= (eventData.capacity || 0),
+      calculatedAt: new Date()
+    };
   }
 }
