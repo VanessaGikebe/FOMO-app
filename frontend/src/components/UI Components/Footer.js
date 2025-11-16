@@ -1,10 +1,10 @@
 "use client";
 
-"use client";
-
 import Link from "next/link";
 import { Image as ImageIcon } from "lucide-react";
-import { Image as ImageIcon } from "lucide-react";
+import { useUser } from "../../contexts/UserContext";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Footer() {
   const { currentUser } = useUser();
