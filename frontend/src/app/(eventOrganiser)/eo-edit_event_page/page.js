@@ -1,12 +1,91 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import { getEventDetails, updateOrganizerEvent, deleteOrganizerEvent } from "@/lib/api";
 import EventForm from "@/components/UI Components/EventForm";
+import Footer from "@/components/UI Components/Footer";
 
-export default function EventOrganiserEditEventPage() {
+// This page needs dynamic rendering because it depends on search params
+export const dynamic = 'force-dynamic';
+
+function EditEventContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { currentUser } = useUser();
+  const [eventData, setEventData] = useState(null);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const eventId = searchParams.get("id");
+
+  useEffect(() => {
+    const loadEvent = async () => {
+      if (!eventId) {
+        setError("Event ID not provided");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const event = await getEventDetails(eventId);
+        setEventData(event);
+      } catch (err) {
+        console.error("Failed to load event:", err);
+        setError("Failed to load event details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEvent();
+  }, [eventId]);
+
+  const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      await updateOrganizerEvent(eventId, formData);
+      router.push("/eo-dashboard");
+    } catch (err) {
+      console.error("Failed to update event:", err);
+      setError("Failed to update event");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+
+    setIsSubmitting(true);
+    try {
+      await deleteOrganizerEvent(eventId);
+      router.push("/eo-dashboard");
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+      setError("Failed to delete event");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    router.back();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading event...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="py-12 px-6">
@@ -48,5 +127,20 @@ export default function EventOrganiserEditEventPage() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+export default function EventOrganiserEditEventPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <EditEventContent />
+    </Suspense>
   );
 }
