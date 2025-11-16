@@ -7,8 +7,6 @@ import * as admin from 'firebase-admin';
 @Injectable()
 export class TicketsService {
   private db = admin.firestore();
-  private orders: Record<string, any> = {};
-  private idCounter = 1;
 
   constructor(private readonly eventsService: EventsService) {}
 
@@ -40,36 +38,94 @@ export class TicketsService {
       return { status: 'insufficient_stock', details: insufficient };
     }
 
-    // create a simple order and increment attendees for demo purposes
-    const orderId = `ord${String(this.idCounter++).padStart(6, '0')}`;
-    const order = {
-      id: orderId,
-      userId: dto.userId || null,
-      items: dto.cartItems,
-      status: 'reserved',
-      createdAt: new Date().toISOString(),
-    };
-    this.orders[orderId] = order;
+    // Generate order ID using auto-increment pattern from Firestore
+    const ordersRef = this.db.collection('orders');
+    const counterRef = this.db.collection('counters').doc('orderCounter');
+    
+    try {
+      // Get and increment the counter
+      const counterSnapshot = await counterRef.get();
+      const currentCount = counterSnapshot.exists ? (counterSnapshot.data()?.value || 0) : 0;
+      const nextCount = currentCount + 1;
+      
+      await counterRef.set({ value: nextCount }, { merge: true });
+      
+      const orderId = `ord${String(nextCount).padStart(6, '0')}`;
+      
+      // Create order object
+      const order = {
+        id: orderId,
+        userId: dto.userId || 'guest',
+        items: dto.cartItems,
+        status: 'reserved',
+        createdAt: admin.firestore.Timestamp.now(),
+        updatedAt: admin.firestore.Timestamp.now(),
+      };
 
-    // apply attendees increment locally on eventsService (in-memory)
-    for (const item of dto.cartItems) {
-      try {
-        const ev = await this.eventsService.getEventById(item.eventId);
-        // prefer attendeeCount field if present
-        if (ev) {
-          const current = Number(ev.attendeeCount ?? ev.attendees ?? 0) || 0;
-          // mutate in-memory event object returned by getEventById (works for mocked/in-memory tests)
-          (ev as any).attendeeCount = current + (item.quantity || 0);
+      // Save order to Firestore
+      await ordersRef.doc(orderId).set(order);
+
+      // Update event attendee counts
+      for (const item of dto.cartItems) {
+        try {
+          const ev = await this.eventsService.getEventById(item.eventId);
+          if (ev) {
+            const current = Number(ev.attendeeCount ?? ev.attendees ?? 0) || 0;
+            // Update in Firestore
+            await this.db.collection('events').doc(item.eventId).update({
+              attendeeCount: current + (item.quantity || 0),
+            });
+          }
+        } catch (err) {
+          console.warn(`Failed to update attendee count for event ${item.eventId}:`, err);
+          // Don't fail the order creation if attendee update fails
         }
-      } catch (err) {
-        // ignore - should not happen because we validated earlier
       }
-    }
 
-    return { status: 'ok', orderId, order };
+      return { status: 'ok', orderId, order: { ...order, createdAt: order.createdAt.toDate().toISOString() } };
+    } catch (err) {
+      console.error('Failed to create order:', err);
+      throw new BadRequestException('order_creation_failed');
+    }
   }
 
-  getOrder(orderId: string) {
-    return this.orders[orderId] || null;
+  async getOrder(orderId: string) {
+    try {
+      const orderDoc = await this.db.collection('orders').doc(orderId).get();
+      if (!orderDoc.exists) {
+        return null;
+      }
+      const orderData = orderDoc.data();
+      return {
+        ...orderData,
+        createdAt: orderData.createdAt?.toDate?.()?.toISOString?.() || orderData.createdAt,
+        updatedAt: orderData.updatedAt?.toDate?.()?.toISOString?.() || orderData.updatedAt,
+      };
+    } catch (err) {
+      console.error('Failed to retrieve order:', err);
+      return null;
+    }
+  }
+
+  async getUserOrders(userId: string) {
+    try {
+      const ordersSnapshot = await this.db
+        .collection('orders')
+        .where('userId', '==', userId)
+        .orderBy('createdAt', 'desc')
+        .get();
+
+      return ordersSnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          createdAt: data.createdAt?.toDate?.()?.toISOString?.() || data.createdAt,
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString?.() || data.updatedAt,
+        };
+      });
+    } catch (err) {
+      console.error('Failed to retrieve user orders:', err);
+      return [];
+    }
   }
 }
