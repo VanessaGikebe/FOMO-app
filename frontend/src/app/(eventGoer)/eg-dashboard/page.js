@@ -59,7 +59,6 @@ export default function EventGoerDashboard() {
           </section>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
