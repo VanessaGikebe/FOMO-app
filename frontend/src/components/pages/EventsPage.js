@@ -75,7 +75,7 @@ export default function EventsPage({ userType = "public" }) {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-orange-50/80 via-purple-50/80 to-teal-50/80 text-gray-900 py-16 px-6 shadow-lg border-b border-gray-200">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#FF6B35]">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
             {getPageTitle()}
           </h1>
           <p className="text-xl text-gray-800 mb-8 font-medium">
@@ -110,7 +110,7 @@ export default function EventsPage({ userType = "public" }) {
           )}
 
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold text-[#FF6B35]">
+            <h2 className="text-2xl font-bold text-gray-900">
               {filteredEvents.length} Events Found
             </h2>
             <select className="px-4 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] focus:border-[#6C5CE7] bg-white hover:border-purple-300 transition-colors">
@@ -134,9 +134,10 @@ export default function EventsPage({ userType = "public" }) {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white/50 rounded-xl backdrop-blur-sm border-2 border-purple-200">
-              <span className="text-6xl mb-4 block">🔍</span>
-              <p className="text-gray-600 text-lg font-medium">No events found. Try adjusting your filters.</p>
+            <div className="text-center py-16">
+              <p className="text-gray-500 text-lg">
+                No events found. Try adjusting your filters.
+              </p>
             </div>
           )}
         </div>
