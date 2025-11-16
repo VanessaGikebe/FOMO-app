@@ -13,6 +13,16 @@ export class TicketsController {
 
   @Get(':id')
   async getOrder(@Param('id') id: string) {
-    return this.ticketsService.getOrder(id);
+    const order = await this.ticketsService.getOrder(id);
+    if (!order) {
+      return { status: 'not_found', message: 'Order not found' };
+    }
+    return { status: 'ok', order };
+  }
+
+  @Get('user/:userId')
+  async getUserOrders(@Param('userId') userId: string) {
+    const orders = await this.ticketsService.getUserOrders(userId);
+    return { status: 'ok', orders };
   }
 }
