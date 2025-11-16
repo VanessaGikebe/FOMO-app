@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@/contexts/UserContext";
 import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 
-// Sample user data - in real app, this would come from authentication
-const sampleUser = {
-  name: "John Doe",
-  email: "john.doe@example.com",
+// Default user data fallback
+const defaultUser = {
+  name: "Guest User",
+  email: "guest@example.com",
   phone: "+254 712 345 678",
   bio: "Event enthusiast and music lover. Always looking for the next great experience!",
   avatar: null,
@@ -19,10 +20,28 @@ const sampleUser = {
   favoriteEvents: 8
 };
 
-export default function ProfilePage({ userData = sampleUser }) {
+export default function ProfilePage() {
+  const { currentUser } = useUser();
+  const [userData, setUserData] = useState(defaultUser);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(userData);
   const [newInterest, setNewInterest] = useState("");
+
+  // Update user data when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      const updatedUserData = {
+        ...defaultUser,
+        name: currentUser.name || currentUser.email || "Guest User",
+        email: currentUser.email || "guest@example.com",
+        joinedDate: currentUser.raw?.createdAt 
+          ? new Date(currentUser.raw.createdAt.seconds * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+          : "January 2024",
+      };
+      setUserData(updatedUserData);
+      setFormData(updatedUserData);
+    }
+  }, [currentUser]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

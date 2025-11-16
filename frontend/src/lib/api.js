@@ -5,6 +5,31 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
 
 /**
+ * Test if backend is reachable
+ * @returns {Promise<boolean>} - True if backend is reachable
+ */
+export async function testBackendConnection() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/test`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    
+    if (response.ok) {
+      const text = await response.text();
+      console.log('✅ Backend connection successful:', text);
+      return true;
+    }
+  } catch (err) {
+    console.error('❌ Backend connection failed:', err);
+  }
+  
+  return false;
+}
+
+/**
  * Submit a ticket order to the backend
  * @param {Array} cartItems - Array of cart items with eventId, quantity, pricePerTicket, etc.
  * @param {string} userId - User ID (optional, defaults to "guest")
@@ -83,6 +108,64 @@ export async function getUserOrders(userId) {
   return orders;
 }
 
+// ============ USER MANAGEMENT ============
+
+/**
+ * Update user role to organizer
+ * @param {string} userId - User ID
+ * @param {string} role - New role (organizer, attendee, moderator)
+ * @param {string} authToken - Firebase auth token
+ * @returns {Promise<Object>} - Update result
+ */
+export async function updateUserRole(userId, role, authToken) {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/auth/set-role`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ userId, role })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    return { error: error.message || `Failed to update role: ${response.statusText}` };
+  }
+
+  return await response.json();
+}
+
+/**
+ * Get current user info
+ * @param {string} authToken - Firebase auth token
+ * @returns {Promise<Object>} - User info
+ */
+export async function getCurrentUser(authToken) {
+  if (!authToken) {
+    return { error: "No auth token provided" };
+  }
+
+  const response = await fetch(`${API_BASE_URL}/auth/user`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${authToken}`
+    }
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    return { error: error.message || `Failed to fetch user: ${response.statusText}` };
+  }
+
+  return await response.json();
+}
+
 // ============ ORGANIZER EVENT MANAGEMENT ============
 
 /**
@@ -122,20 +205,29 @@ export async function createOrganizerEvent(eventData, authToken = null) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/events`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(eventData)
-  });
+  try {
+    console.log('Creating event:', { url: `${API_BASE_URL}/events`, eventData });
+    
+    const response = await fetch(`${API_BASE_URL}/events`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(eventData)
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      errorData.message || `Failed to create event: ${response.statusText}`
-    );
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: response.statusText }));
+      throw new Error(
+        errorData.message || `Failed to create event: ${response.statusText}`
+      );
+    }
+
+    const result = await response.json();
+    console.log('Event created successfully:', result);
+    return result;
+  } catch (err) {
+    console.error('createOrganizerEvent error:', err);
+    throw err;
   }
-
-  return response.json();
 }
 
 /**
