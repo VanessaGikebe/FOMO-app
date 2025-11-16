@@ -75,7 +75,7 @@ export default function EventsPage({ userType = "public" }) {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-orange-50/80 via-purple-50/80 to-teal-50/80 text-gray-900 py-16 px-6 shadow-lg border-b border-gray-200">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[#FF6B35]">
             {getPageTitle()}
           </h1>
 <<<<<<< HEAD
@@ -122,7 +122,7 @@ export default function EventsPage({ userType = "public" }) {
           )}
 
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold text-[#FF6B35]">
               {filteredEvents.length} Events Found
             </h2>
             <select className="px-4 py-2 border-2 border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] focus:border-[#6C5CE7] bg-white hover:border-purple-300 transition-colors">

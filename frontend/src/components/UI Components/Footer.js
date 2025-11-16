@@ -3,9 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { useUser } from "@/contexts/UserContext";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { Image as ImageIcon } from "lucide-react";
 import { Image as ImageIcon } from "lucide-react";
 
 export default function Footer() {
@@ -81,7 +79,7 @@ export default function Footer() {
   );
 
   return (
-    <footer className="bg-gradient-to-br from-teal-50 via-purple-50 to-orange-50 border-t border-gray-200 py-12 px-6">
+    <footer className="bg-gray-50 border-t border-gray-200 py-12 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
@@ -102,7 +100,7 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Quick Links - Dynamic based on user type */}
+          {/* Quick Links */}
           <div>
             <h3 className="font-bold bg-gradient-to-r from-[#00D9C0] to-[#6C5CE7] bg-clip-text text-transparent mb-4">
               Quick Links
@@ -234,7 +232,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="text-center text-sm text-gray-800 pt-8 border-t border-gray-200 font-medium">
+        <div className="text-center text-sm text-gray-600 pt-8 border-t border-gray-200">
           ©2025 FOMO. All Rights Reserved.
         </div>
       </div>

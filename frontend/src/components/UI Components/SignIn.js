@@ -110,7 +110,7 @@ export default function SignIn() {
             <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded-xl flex items-center justify-center">
                 <span className="text-3xl">📸</span>
             </div>
-            <h1 className="bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent text-4xl mt-3 font-bold">FOMO</h1>
+            <h1 className="text-[#FF6B35] text-4xl mt-3 font-bold">FOMO</h1>
         </div>
 
         <h3 className="text-2xl font-bold text-gray-900 mb-8">Sign In</h3>
@@ -162,7 +162,8 @@ export default function SignIn() {
           <button
             type="button"
             onClick={handleGoogle}
-            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all`}
+            disabled={isLoading}
+            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">
               <path
