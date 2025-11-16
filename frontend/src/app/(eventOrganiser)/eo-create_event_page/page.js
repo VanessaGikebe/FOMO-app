@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
-import { createOrganizerEvent, testBackendConnection } from "@/lib/api";
+import { createOrganizerEvent } from "@/lib/api";
 import EventForm from "@/components/UI Components/EventForm";
 
 export default function CreateEventPage() {
@@ -11,17 +11,6 @@ export default function CreateEventPage() {
   const { currentUser, getAuthToken } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
-  const [backendStatus, setBackendStatus] = useState(null);
-
-  useEffect(() => {
-    // Check backend connection on mount
-    const checkBackend = async () => {
-      const isConnected = await testBackendConnection();
-      setBackendStatus(isConnected ? "connected" : "disconnected");
-    };
-    
-    checkBackend();
-  }, []);
 
   const handleSubmit = async (formData) => {
     setError(null);
@@ -86,27 +75,15 @@ export default function CreateEventPage() {
       <div className="py-12 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-8">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">Create New Event</h1>
-                <p className="text-gray-600">Fill in the details to create your event</p>
-              </div>
-              {/* Backend Status Indicator */}
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${backendStatus === 'connected' ? 'bg-green-100 text-green-800' : backendStatus === 'disconnected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                {backendStatus === 'connected' ? '✅ Connected' : backendStatus === 'disconnected' ? '❌ Disconnected' : '⏳ Checking...'}
-              </div>
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Create New Event</h1>
+              <p className="text-gray-600">Fill in the details to create your event</p>
             </div>
             
             {/* Error Message */}
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-700 font-medium">{error}</p>
-              </div>
-            )}
-            
-            {backendStatus === 'disconnected' && (
-              <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <p className="text-orange-700 font-medium">⚠️ Backend is not responding. Make sure the backend server is running on port 3002.</p>
               </div>
             )}
             
