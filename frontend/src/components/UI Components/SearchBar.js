@@ -34,17 +34,56 @@ export default function SearchBar({
     }
   };
 
+  // Real-time search as user types
+  const handleSearchTermChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (onSearch) {
+      onSearch({
+        searchTerm: value,
+        category: selectedCategory,
+        location: selectedLocation
+      });
+    }
+  };
+
+  // Real-time filter update for category
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    setSelectedCategory(value);
+    if (onSearch) {
+      onSearch({
+        searchTerm,
+        category: value,
+        location: selectedLocation
+      });
+    }
+  };
+
+  // Real-time filter update for location
+  const handleLocationChange = (e) => {
+    const value = e.target.value;
+    setSelectedLocation(value);
+    if (onSearch) {
+      onSearch({
+        searchTerm,
+        category: selectedCategory,
+        location: value
+      });
+    }
+  };
+
   return (
     <div className="w-full">
       {/* Search Input */}
-      <form onSubmit={handleSearch} className="relative">
+      <div className="relative">
         <div className="flex gap-2">
           <div className="relative flex-1">
             <input
               type="text"
               placeholder={placeholder}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchTermChange}
               className="w-full px-5 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">
@@ -52,13 +91,14 @@ export default function SearchBar({
             </span>
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={handleSearch}
             className="bg-black text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
             Search
           </button>
         </div>
-      </form>
+      </div>
 
       {/* Filters (Optional) */}
       {showFilters && (
@@ -70,7 +110,7 @@ export default function SearchBar({
             </label>
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={handleCategoryChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             >
               {categories.map((cat) => (
@@ -88,7 +128,7 @@ export default function SearchBar({
             </label>
             <select
               value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
+              onChange={handleLocationChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             >
               <option value="all">All Locations</option>
