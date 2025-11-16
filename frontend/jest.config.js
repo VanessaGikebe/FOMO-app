@@ -1,7 +1,8 @@
 module.exports = {
   testEnvironment: "jsdom",
-   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+  transform: {
+    // Use next/jest for transforming test files
+    "^.+\\.(js|jsx|ts|tsx)$": ["next/jest", { "configFile": "./next.config.mjs" }]
   },
   moduleNameMapper: {
     // Support Next.js-style imports like "@/components"

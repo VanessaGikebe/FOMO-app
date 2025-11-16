@@ -6,12 +6,12 @@ const EventCard = ({ category = "Category", title = "Event Title", venue = "Even
   // Outer container: w-1/3 on large screens for 3 cards per row, using p-4 for spacing
   <div className="w-full sm:w-1/2 lg:w-1/3 p-4 flex-shrink-0">
     {/* Inner Card: Background, rounded corners, shadow */}
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col border-2 border-purple-100 hover:border-[#6C5CE7] transition-all hover:shadow-xl">
       {/* 1. Image/Visual Placeholder Section (Matches the large gray box) */}
-      <div className="bg-gray-100 relative pt-[56.25%]"> {/* pt-[56.25%] creates a 16:9 aspect ratio */}
+      <div className="bg-gradient-to-br from-orange-50 to-purple-50 relative pt-[56.25%]"> {/* pt-[56.25%] creates a 16:9 aspect ratio */}
 
         {/* Category Tag (Top Right) */}
-        <div className="absolute top-4 right-4 bg-gray-900 text-white text-xs font-semibold px-3 py-1 rounded-full">
+        <div className="absolute top-4 right-4 bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
           {category}
         </div>
 
@@ -35,12 +35,12 @@ const EventCard = ({ category = "Category", title = "Event Title", venue = "Even
         {/* Date/Time: Small text with icon */}
         <div className="text-base text-gray-600 flex items-center space-x-2 mb-6">
           {/* Calendar Icon Placeholder */}
-          <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <svg className="w-5 h-5 text-[#6C5CE7]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           <span className="font-medium">{venue} | {time}</span> 
         </div>
 
         {/* View Event Button (Full width) */}
-        <button className="w-full bg-gray-800 text-white text-sm py-2.5 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out font-semibold">
+        <button className="w-full bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
           View Event
         </button>
       </div>
@@ -61,7 +61,7 @@ const EventSection = ({ title, description, count }) => {
 
     return (
         <section className="mb-14">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">{title}</h2>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">{title}</h2>
             <p className="text-gray-600 mb-8">{description}</p>
             {/* Flex container for cards: justify-center for centering, -mx-4 for negative margin to compensate for card padding */}
             <div className="flex flex-wrap justify-center -mx-4">
@@ -84,7 +84,7 @@ const EventSection = ({ title, description, count }) => {
 
 export default function EventGoerDashboard() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       {/* The Header/Nav from the previous response would go here */}
 
       {/* --- Main Dashboard Content --- */}

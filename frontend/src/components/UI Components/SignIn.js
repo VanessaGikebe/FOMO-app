@@ -31,32 +31,30 @@ export default function SignIn() {
   const isFormValid = email.trim() !== '' && password.trim() !== '';
 
   // Determine the dynamic class set for the Log In button
-  const loginButtonClasses = `${buttonBaseClasses} w-full transition-colors ${
+  const loginButtonClasses = `${buttonBaseClasses} w-full transition-all ${
     (isLoading || isFormValid)
-    ? 'bg-foreground text-white hover:bg-gray-800' // Enabled / Loading State: Black Fill
-    : 'bg-white text-foreground border border-foreground' // Disabled State: White Outline
+    ? 'bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white hover:shadow-lg hover:scale-105' // Enabled / Loading State: Orange Gradient
+    : 'bg-white text-gray-400 border-2 border-gray-300 cursor-not-allowed' // Disabled State: Gray Outline
   }`;
 
   return (
     // Outer container for centering
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 flex items-center justify-center p-4 font-sans">
       
       {/* Main form container: border-foreground (black) applied, rounded corners */}
-      <div className="w-full max-w-sm p-6 bg-white rounded-xl border border-foreground">
+      <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-purple-200 shadow-xl">
         
         {/* Centered Logo and FOMO text */}
         <div className="flex flex-col items-center mb-4">
             {/* Logo image */}
-            <img 
-                src="https://via.placeholder.com/64x64.png?text=Logo" // Placeholder image URL
-                alt="Logo" 
-                className="w-16 h-16 object-cover rounded-xl"
-            />
-            <h1 className="text-foreground text-4xl mt-3 font-normal">FOMO</h1>
+            <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded-xl flex items-center justify-center">
+                <span className="text-3xl">📸</span>
+            </div>
+            <h1 className="bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent text-4xl mt-3 font-bold">FOMO</h1>
         </div>
 
         {/* Sign In text */}
-        <h3 className="text-2xl font-normal text-foreground mb-8">Sign In</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-8">Sign In</h3>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           
@@ -72,7 +70,7 @@ export default function SignIn() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
+              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -87,7 +85,7 @@ export default function SignIn() {
               onChange={(e) => setLabel(e.target.value)}
               required
               // Apply inputBaseClasses for consistency, override bg to white, add mt-1 for spacing
-              className={`${inputBaseClasses} mt-1 bg-white`}
+              className={`${inputBaseClasses} mt-1 bg-white border-2 border-purple-200 focus:border-[#6C5CE7]`}
             >
                 <option value="experience_seeker">Experience Seeker</option>
                 <option value="event_organiser">Event Organiser</option>
@@ -107,13 +105,13 @@ export default function SignIn() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
+              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
           
           {/* Forgot password aligned to the left (Native Link) */}
           <div className="text-left">
-            <a href="#" className="text-sm text-foreground hover:underline font-medium transition-colors">
+            <a href="#" className="text-sm text-[#6C5CE7] hover:text-[#5B4BCF] hover:underline font-medium transition-colors">
               Forgot password?
             </a>
           </div>
@@ -152,7 +150,7 @@ export default function SignIn() {
           <button
             type="button"
             // Use buttonBaseClasses and specify outline styles
-            className={`${buttonBaseClasses} w-full border border-foreground bg-white text-foreground hover:bg-gray-50 transition-colors`}
+            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all`}
           >
             {/* Google Logo SVG - Set to text-foreground (black) */}
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">
@@ -181,7 +179,7 @@ export default function SignIn() {
           <div className="mt-6 text-center text-sm">
           <p className="text-muted-foreground">
             Don't have an account?{" "}
-            <Link href="/signup" className="text-foreground hover:underline font-medium transition-colors">
+            <Link href="/signup" className="text-[#FF6B35] hover:text-[#E55A2B] hover:underline font-medium transition-colors">
               Sign Up
             </Link>
           </p>
