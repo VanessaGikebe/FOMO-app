@@ -2,27 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEvents } from '@/contexts/EventsContext';
 import { useUser } from '@/contexts/UserContext';
 import EventCardComponent from '@/components/UI Components/EventCard';
+import { getEventMetrics, getEventsByOrganizer } from '@/lib/api';
 
 // --- Utility Components ---
 
 // Component for the Metric/Stat Cards with updated icons
-const MetricCard = ({ title, value, iconPath }) => (
+const MetricCard = ({ title, value, iconPath, isLoading = false }) => (
   <div className="w-full sm:w-1/3 p-2">
     <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-4 border-2 border-purple-100 hover:border-[#6C5CE7] transition-all">
       {/* Icon Area */}
       <div className="flex-shrink-0 bg-gradient-to-br from-[#6C5CE7] to-[#5B4BCF] rounded-full p-2">
         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          {/* Using the specific iconPath provided by the parent component */}
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPath} />
+          {!isLoading && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPath} />}
         </svg>
       </div>
       {/* Text/Value Area */}
       <div>
         <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] to-[#6C5CE7] bg-clip-text text-transparent">{value}</p>
+        <p className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] to-[#6C5CE7] bg-clip-text text-transparent">
+          {isLoading ? "..." : value}
+        </p>
       </div>
     </div>
   </div>
@@ -92,17 +93,91 @@ const QuickActionButton = ({ title, iconPath, onClick }) => (
 // --- Main Dashboard Component ---
 
 export default function EventOrganiserDashboard() {
-  const { getEventsByOrganizer, events } = useEvents();
   const { getUserId } = useUser();
   const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [metrics, setMetrics] = useState({
+    totalVisits: 0,
+    ticketsSold: 0,
+    conversionRate: 0,
+    isLoading: true
+  });
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const router = useRouter();
 
+  // Fetch organizer's events on mount
   useEffect(() => {
     const uid = getUserId();
-    if (!uid) return;
-    const list = getEventsByOrganizer(uid) || [];
-    setUpcomingEvents(list);
-  }, [events, getUserId]);
+    if (!uid) {
+      setIsLoadingEvents(false);
+      setMetrics(prev => ({ ...prev, isLoading: false }));
+      return;
+    }
+
+    const fetchEvents = async () => {
+      try {
+        setIsLoadingEvents(true);
+        const events = await getEventsByOrganizer(uid);
+        
+        if (Array.isArray(events)) {
+          setUpcomingEvents(events);
+          // Fetch metrics for organizer's events
+          if (events.length > 0) {
+            await fetchMetrics(events);
+          } else {
+            setMetrics(prev => ({ ...prev, isLoading: false }));
+          }
+        } else {
+          console.warn('Failed to fetch events:', events?.error);
+          setMetrics(prev => ({ ...prev, isLoading: false }));
+        }
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        setMetrics(prev => ({ ...prev, isLoading: false }));
+      } finally {
+        setIsLoadingEvents(false);
+      }
+    };
+
+    fetchEvents();
+  }, [getUserId]);
+
+  const fetchMetrics = async (eventList) => {
+    try {
+      setMetrics(prev => ({ ...prev, isLoading: true }));
+      
+      let totalVisits = 0;
+      let totalTicketsSold = 0;
+      let totalRevenue = 0;
+
+      // Fetch metrics for all organizer's events
+      for (const event of eventList) {
+        try {
+          const eventMetrics = await getEventMetrics(event.id);
+          if (eventMetrics) {
+            totalVisits += eventMetrics.visits || 0;
+            totalTicketsSold += eventMetrics.ticketsSold || 0;
+            totalRevenue += eventMetrics.revenue || 0;
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch metrics for event ${event.id}:`, err);
+        }
+      }
+
+      const conversionRate = totalVisits > 0 
+        ? Math.round((totalTicketsSold / totalVisits) * 100)
+        : 0;
+
+      setMetrics({
+        totalVisits,
+        ticketsSold: totalTicketsSold,
+        conversionRate,
+        isLoading: false
+      });
+    } catch (err) {
+      console.error('Failed to fetch metrics:', err);
+      setMetrics(prev => ({ ...prev, isLoading: false }));
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       
@@ -115,26 +190,26 @@ export default function EventOrganiserDashboard() {
           {/* 1. Digital Event Metrics Section */}
           <section className="mb-12">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Digital Event Metrics</h2>
-            <p className="text-gray-600 mb-6">Understand how visitors interact with your event website</p>
+            <p className="text-gray-600 mb-6">Understand how visitors interact with your events</p>
             
             <div className="flex flex-wrap -m-2">
-              {/* Total Visits: UPDATED to single Human Icon */}
               <MetricCard 
                 title="Total Visits" 
-                value="1278" 
-                iconPath="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" // Single person icon
+                value={metrics.totalVisits.toLocaleString()}
+                iconPath="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                isLoading={metrics.isLoading}
               />
-              {/* Tickets Sold */}
               <MetricCard 
                 title="Tickets Sold" 
-                value="742" 
-                iconPath="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" 
+                value={metrics.ticketsSold.toLocaleString()}
+                iconPath="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                isLoading={metrics.isLoading}
               />
-              {/* Conversion Rate */}
               <MetricCard 
-                title="Conversion rate" 
-                value="58%" 
-                iconPath="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" // Upward trend line
+                title="Conversion Rate" 
+                value={`${metrics.conversionRate}%`}
+                iconPath="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                isLoading={metrics.isLoading}
               />
             </div>
           </section>

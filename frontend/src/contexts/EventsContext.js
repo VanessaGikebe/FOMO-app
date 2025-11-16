@@ -80,11 +80,13 @@ export function EventsProvider({ children }) {
         const docs = snapshot.docs.map(d => normalizeEvent(d.id, d.data()));
         setEvents(docs);
       }, (err) => {
-        console.error('Failed to listen to events collection:', err);
+        // Firestore permission errors are expected if using backend API
+        // Frontend will fetch data through backend endpoints instead
+        console.warn('Firestore events subscription unavailable (using backend API instead):', err?.code || err?.message);
       });
     } catch (err) {
-      console.warn('Realtime events subscription failed, falling back to local data:', err);
-      // keep initialEvents
+      console.warn('Realtime events subscription failed, using backend API fallback:', err);
+      // keep initialEvents - backend API will provide data
     }
     return () => unsub();
   }, []);

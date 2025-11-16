@@ -1,42 +1,50 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
+import { createOrganizerEvent } from "@/lib/api";
 import EventForm from "@/components/UI Components/EventForm";
 
 export default function CreateEventPage() {
   const router = useRouter();
-  const { createEvent } = useEvents();
-  const { currentUser } = useUser();
+  const { currentUser, getAuthToken } = useUser();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (formData) => {
-    // Add organizer info to the event
-    const eventData = {
-      ...formData,
-      
-      organizerId: currentUser?.uid || null,
-      organizerName: currentUser?.name || '',
-      image: null
-    };
+    setError(null);
+    setIsSubmitting(true);
 
     try {
-      // Create the event (writes to Firestore)
-      const newEvent = await createEvent(eventData);
+      const authToken = await getAuthToken();
+      
+      const eventData = {
+        ...formData,
+        organizerId: currentUser?.uid || null,
+        organizerName: currentUser?.name || '',
+        image: null
+      };
 
-      // Show success message
-      alert(`Event "${newEvent.title || eventData.title}" created successfully!`);
-
-      // Redirect to manage events page
-      router.push("/eo-manageEvents");
+      // Create event via API
+      const response = await createOrganizerEvent(eventData, authToken);
+      
+      if (response && response.id) {
+        alert(`Event "${response.title || eventData.title}" created successfully!`);
+        router.push("/eo-dashboard");
+      } else {
+        setError(response?.error || 'Failed to create event');
+      }
     } catch (err) {
-      console.error('Failed to create event', err);
-      alert('Failed to create event. Please try again.');
+      console.error('Failed to create event:', err);
+      setError(err.message || 'Failed to create event. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleCancel = () => {
-    router.push("/eo-manageEvents");
+    router.push("/eo-dashboard");
   };
 
   return (
@@ -47,10 +55,18 @@ export default function CreateEventPage() {
             <h1 className="text-4xl font-bold text-gray-900 mb-2">Create New Event</h1>
             <p className="text-gray-600 mb-8">Fill in the details to create your event</p>
             
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700 font-medium">{error}</p>
+              </div>
+            )}
+            
             <EventForm 
               onSubmit={handleSubmit}
               onCancel={handleCancel}
               isEditing={false}
+              isLoading={isSubmitting}
             />
           </div>
         </div>

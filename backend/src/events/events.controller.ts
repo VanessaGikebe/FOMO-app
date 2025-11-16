@@ -28,6 +28,11 @@ export class EventsController {
     return this.eventsService.getEvents();
   }
 
+  @Get('organizer/:organizerId')
+  getEventsByOrganizer(@Param('organizerId') organizerId: string) {
+    return this.eventsService.getEventsByOrganizer(organizerId);
+  }
+
   @Get(':id')
   getEventById(@Param('id') id: string) {
     return this.eventsService.getEventById(id);
@@ -109,6 +114,13 @@ export class EventsController {
     }
     const isFav = await this.eventsService.isFavourite(req.user.id, eventId);
     return { isFavourite: isFav };
+  }
+
+  // ============ ANALYTICS & METRICS ENDPOINTS ============
+
+  @Get(':id/metrics')
+  async getEventMetrics(@Param('id') eventId: string) {
+    return this.eventsService.getEventMetrics(eventId);
   }
 
   // ============ MODERATOR ENDPOINTS ============

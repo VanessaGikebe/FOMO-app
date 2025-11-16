@@ -82,3 +82,161 @@ export async function getUserOrders(userId) {
   const orders = await response.json();
   return orders;
 }
+
+// ============ ORGANIZER EVENT MANAGEMENT ============
+
+/**
+ * Get all events for a specific organizer
+ * @param {string} organizerId - Organizer/User ID
+ * @returns {Promise<Array>} - Array of organizer's events
+ */
+export async function getEventsByOrganizer(organizerId) {
+  const response = await fetch(`${API_BASE_URL}/events/organizer/${organizerId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    return { error: error.message || `Failed to fetch organizer events: ${response.statusText}` };
+  }
+
+  const events = await response.json();
+  return events;
+}
+
+/**
+ * Create a new event
+ * @param {Object} eventData - Event details
+ * @param {string} authToken - Firebase auth token (optional)
+ * @returns {Promise<Object>} - Created event with ID
+ */
+export async function createOrganizerEvent(eventData, authToken = null) {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/events`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(eventData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to create event: ${response.statusText}`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Get event by ID
+ * @param {string} eventId - Event ID
+ * @returns {Promise<Object>} - Event details
+ */
+export async function getEventDetails(eventId) {
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch event: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Update an existing event
+ * @param {string} eventId - Event ID
+ * @param {Object} updateData - Updated event details
+ * @param {string} authToken - Firebase auth token (optional)
+ * @returns {Promise<Object>} - Updated event
+ */
+export async function updateOrganizerEvent(eventId, updateData, authToken = null) {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(updateData)
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to update event: ${response.statusText}`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Delete an event
+ * @param {string} eventId - Event ID
+ * @param {string} authToken - Firebase auth token (optional)
+ * @returns {Promise<Object>} - Deletion confirmation
+ */
+export async function deleteOrganizerEvent(eventId, authToken = null) {
+  const headers = {
+    "Content-Type": "application/json"
+  };
+  
+  if (authToken) {
+    headers["Authorization"] = `Bearer ${authToken}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
+    method: "DELETE",
+    headers
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to delete event: ${response.statusText}`
+    );
+  }
+
+  return response.json();
+}
+
+/**
+ * Get event metrics
+ * @param {string} eventId - Event ID
+ * @returns {Promise<Object>} - Event metrics (visits, sales, etc.)
+ */
+export async function getEventMetrics(eventId) {
+  const response = await fetch(`${API_BASE_URL}/events/${eventId}/metrics`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    console.warn(`Failed to fetch metrics for event ${eventId}`);
+    return null;
+  }
+
+  return response.json();
+}
