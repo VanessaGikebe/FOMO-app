@@ -1,8 +1,8 @@
 "use client";
 
+import { Footer } from "@/components";
 import { useEvents } from "@/contexts/EventsContext";
 import EventCardComponent from "@/components/UI Components/EventCard";
-import { Footer } from "@/components";
 
 export default function EventGoerDashboard() {
   const { getAllEvents } = useEvents();
@@ -59,6 +59,7 @@ export default function EventGoerDashboard() {
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

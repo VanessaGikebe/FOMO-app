@@ -78,8 +78,8 @@ export default function EventsPage({ userType = "public" }) {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             {getPageTitle()}
           </h1>
-          <p className="text-xl text-gray-300 mb-8">
-            {userType === "eventOrganiser"
+          <p className="text-xl text-gray-800 mb-8 font-medium">
+            {userType === "eventOrganiser" 
               ? "View and manage all events on the platform"
               : userType === "moderator"
               ? "Monitor and moderate all events"
@@ -102,10 +102,7 @@ export default function EventsPage({ userType = "public" }) {
           {userType === "eventOrganiser" && (
             <div className="mb-8">
               <Link href="/eo-create_event_page">
-                <Button
-                  variant="primary"
-                  className="bg-black text-white hover:bg-gray-800"
-                >
+                <Button variant="primary" className="shadow-lg hover:shadow-xl">
                   + Create New Event
                 </Button>
               </Link>
