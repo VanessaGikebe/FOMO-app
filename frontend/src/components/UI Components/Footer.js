@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { Image as ImageIcon } from "lucide-react";
-
 import { useUser } from "../../contexts/UserContext";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Footer() {
   // 1. Get the user type directly from the context
