@@ -73,7 +73,7 @@ export default function Navbar({ userType = "public" }) {
             <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded flex items-center justify-center group-hover:scale-110 transition-transform">
               <span className="text-lg">📸</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent">{config.logo}</span>
+            <span className="text-xl font-bold text-[#FF6B35]">{config.logo}</span>
           </Link>
 
           {/* Navigation Links */}

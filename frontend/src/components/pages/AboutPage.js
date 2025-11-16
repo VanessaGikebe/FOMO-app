@@ -7,7 +7,7 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold text-[#FF6B35] mb-4">
             About FOMO
           </h1>
           <p className="text-xl text-gray-800 font-semibold">

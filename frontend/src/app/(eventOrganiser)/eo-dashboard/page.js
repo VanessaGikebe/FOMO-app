@@ -189,7 +189,7 @@ export default function EventOrganiserDashboard() {
           
           {/* 1. Digital Event Metrics Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Digital Event Metrics</h2>
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">Digital Event Metrics</h2>
             <p className="text-gray-600 mb-6">Understand how visitors interact with your events</p>
             
             <div className="flex flex-wrap -m-2">
@@ -216,7 +216,7 @@ export default function EventOrganiserDashboard() {
           
           {/* 2. My Upcoming Events Section (Uses the updated EventCard) */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">My Upcoming Events</h2>
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">My Upcoming Events</h2>
             <p className="text-gray-600 mb-6">Review scheduled events to refine marketing and update key details</p>
             
             <div className="flex flex-wrap -m-2">
@@ -237,7 +237,7 @@ export default function EventOrganiserDashboard() {
           
           {/* 3. Quick Actions Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Quick Actions</h2>
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">Quick Actions</h2>
             <p className="text-gray-600 mb-6">Streamline your workflow with easy one-step actions</p>
             
             <div className="flex flex-wrap -m-2">

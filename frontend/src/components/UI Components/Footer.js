@@ -82,7 +82,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-gradient-to-br from-[#00D9C0] to-[#6C5CE7] rounded-lg flex items-center justify-center">
                 <span className="text-xl">📸</span>
               </div>
-              <h1 className="bg-gradient-to-r from-[#00D9C0] via-[#6C5CE7] to-[#FF6B35] bg-clip-text text-transparent text-xl font-bold">FOMO</h1>
+              <h1 className="text-[#FF6B35] text-xl font-bold">FOMO</h1>
             </div>
             <p className="text-sm text-gray-800 mb-2 font-medium">Email: info@fomo.com</p>
             <p className="text-sm text-gray-800 font-medium">Phone No: 0712345678</p>

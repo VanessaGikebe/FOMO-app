@@ -87,7 +87,7 @@ export default function SignUp() {
             <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded-xl flex items-center justify-center">
                 <span className="text-3xl">📸</span>
             </div>
-            <h1 className="bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent text-4xl mt-3 font-bold">FOMO</h1>
+            <h1 className="text-[#FF6B35] text-4xl mt-3 font-bold">FOMO</h1>
         </div>
 
         {/* Sign Up text */}

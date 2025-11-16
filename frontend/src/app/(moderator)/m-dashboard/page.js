@@ -124,7 +124,7 @@ export default function ModeratorDashboard() {
           
           {/* 1. Moderator Insights Section (Metrics) */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Moderator Insights</h2>
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">Moderator Insights</h2>
             <p className="text-gray-600 mb-6">Track approvals, declines, and overall moderation activity</p>
             
             <div className="flex flex-wrap -m-2">
@@ -157,7 +157,7 @@ export default function ModeratorDashboard() {
           
           {/* 2. Events to Moderate Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Events to Moderate</h2>
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">Events to Moderate</h2>
             <p className="text-gray-600 mb-6">Review new event submissions for compliance and content quality</p>
             
             <div className="flex flex-wrap -m-2">
@@ -177,7 +177,7 @@ export default function ModeratorDashboard() {
           
           {/* 3. Quick Actions Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Quick Actions</h2>
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">Quick Actions</h2>
             <p className="text-gray-600 mb-6">Streamline your moderation workflow with easy one-step actions</p>
             
             <div className="flex flex-wrap -m-2">
