@@ -1,4 +1,6 @@
 
+"use client";
+
 import React, { useEffect } from "react";
 // MOCK useRouter:
 const useRouter = () => ({

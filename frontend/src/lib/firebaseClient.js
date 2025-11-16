@@ -1,6 +1,6 @@
 // frontend/src/lib/firebaseClient.js
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -16,6 +16,14 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
 export const auth = getAuth(app);
+
+// Enable local storage persistence (survives page refreshes and browser restarts)
+if (typeof window !== 'undefined') {
+  setPersistence(auth, browserLocalPersistence).catch(err => {
+    console.warn('Failed to set persistence:', err);
+  });
+}
+
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 

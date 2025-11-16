@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from '../lib/firebaseClient';
 import { doc, getDoc } from 'firebase/firestore';
@@ -10,11 +10,18 @@ const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const tokenRefreshIntervalRef = useRef(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      // Clear any existing token refresh interval
+      if (tokenRefreshIntervalRef.current) {
+        clearInterval(tokenRefreshIntervalRef.current);
+        tokenRefreshIntervalRef.current = null;
+      }
+
       if (!fbUser) {
         setCurrentUser(null);
         return;
@@ -37,13 +44,30 @@ export function UserProvider({ children }) {
           // no firestore doc; fallback to minimal info
           setCurrentUser({ uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName, type: 'public' });
         }
+
+        // Set up automatic token refresh every 50 minutes (before 1-hour expiry)
+        if (fbUser.uid) {
+          tokenRefreshIntervalRef.current = setInterval(async () => {
+            try {
+              await fbUser.getIdToken(true);
+              console.log('🔄 Token auto-refreshed');
+            } catch (err) {
+              console.warn('Token auto-refresh failed:', err);
+            }
+          }, 50 * 60 * 1000); // Refresh every 50 minutes
+        }
       } catch (err) {
         console.error('Failed to load user doc from Firestore', err);
         setCurrentUser({ uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName, type: 'public' });
       }
     });
 
-    return () => unsub();
+    return () => {
+      unsub();
+      if (tokenRefreshIntervalRef.current) {
+        clearInterval(tokenRefreshIntervalRef.current);
+      }
+    };
   }, []);
 
   const logout = async () => {
