@@ -55,6 +55,36 @@ export function UserProvider({ children }) {
     }
   };
 
+  const getAuthToken = async () => {
+    if (!auth.currentUser) {
+      console.error('No authenticated user');
+      throw new Error('No authenticated user found');
+    }
+
+    try {
+      console.log('Getting auth token for user:', auth.currentUser.uid);
+      // Try with force refresh first
+      const token = await auth.currentUser.getIdToken(true);
+      console.log('✅ Successfully got auth token');
+      return token;
+    } catch (err) {
+      console.error('Failed to get auth token with force refresh:', err);
+      
+      // Fallback: try without force refresh (uses cached token)
+      try {
+        console.log('Trying to get cached token without refresh...');
+        const cachedToken = await auth.currentUser.getIdToken(false);
+        if (cachedToken) {
+          console.log('✅ Got cached auth token');
+          return cachedToken;
+        }
+      } catch (cacheErr) {
+        console.error('Failed to get cached token:', cacheErr);
+      }
+      
+      throw err;
+    }
+  };
 
   const isAuthenticated = () => currentUser !== null;
   const getUserType = () => currentUser?.type || 'public';
@@ -88,6 +118,7 @@ export function UserProvider({ children }) {
     isAuthenticated,
     getUserType,
     getUserId,
+    getAuthToken,
     addToFavorites,
     removeFromFavorites,
     isFavorite,
