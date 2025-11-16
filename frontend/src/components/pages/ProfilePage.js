@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
-import Button from "../UI Components/Button";
+import Button from "../UI Components/Button"; // <-- No spaces in folder name
+import { UserIcon } from "@heroicons/react/24/solid"; // <-- Heroicons person icon
 
-// Default user data fallback - only essential fields from Firebase
+// Default user data fallback
 const defaultUser = {
   name: "Guest User",
   email: "guest@example.com",
@@ -26,7 +27,6 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState(userData);
   const [newInterest, setNewInterest] = useState("");
 
-  // Update user data when currentUser changes
   useEffect(() => {
     if (currentUser) {
       const updatedUserData = {
@@ -94,7 +94,7 @@ export default function ProfilePage() {
       <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-12 px-6">
         <div className="max-w-4xl mx-auto flex items-center gap-6">
           {/* Avatar */}
-          <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center text-6xl">
+          <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center">
             {formData.avatar ? (
               <img
                 src={formData.avatar}
@@ -102,7 +102,7 @@ export default function ProfilePage() {
                 className="w-full h-full rounded-full object-cover"
               />
             ) : (
-              <span className="text-gray-700 font-bold">U</span> // Replacing 👤
+              <UserIcon className="w-20 h-20 text-gray-700" /> // <-- Person icon
             )}
           </div>
 
@@ -115,7 +115,6 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          {/* Edit Button */}
           {!isEditing && (
             <Button
               variant="outline"
@@ -128,7 +127,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Profile Stats - Placeholder for real data from Firestore */}
+      {/* Profile Stats */}
       <section className="py-8 px-6 bg-white border-b">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-6 bg-gray-50 rounded-xl">
@@ -310,7 +309,7 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Action Buttons */}
+            {/* Save / Cancel */}
             {isEditing && (
               <div className="flex gap-4 pt-4">
                 <Button variant="primary" onClick={handleSave}>
