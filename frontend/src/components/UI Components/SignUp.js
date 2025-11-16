@@ -76,24 +76,22 @@ export default function SignUp() {
 
   return (
     // Outer container for centering
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 flex items-center justify-center p-4 font-sans">
       
       {/* Main form container: border-foreground (black) applied, rounded corners */}
-      <div className="w-full max-w-sm p-6 bg-white rounded-xl border border-foreground">
+      <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-purple-200 shadow-xl">
         
         {/* Centered Logo and FOMO text */}
         <div className="flex flex-col items-center mb-6">
             {/* Logo image */}
-            <img 
-                src="https://via.placeholder.com/64x64.png?text=Logo" // Placeholder image URL
-                alt="Logo" 
-                className="w-16 h-16 object-cover rounded-xl"
-            />
-            <h1 className="text-foreground text-4xl mt-3 font-normal">FOMO</h1>
+            <div className="w-16 h-16 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded-xl flex items-center justify-center">
+                <span className="text-3xl">📸</span>
+            </div>
+            <h1 className="bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent text-4xl mt-3 font-bold">FOMO</h1>
         </div>
 
         {/* Sign Up text */}
-        <h3 className="text-2xl font-normal text-foreground mb-8">Sign Up</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-8">Sign Up</h3>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           
@@ -109,7 +107,7 @@ export default function SignUp() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
+              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -125,7 +123,7 @@ export default function SignUp() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
+              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -140,7 +138,7 @@ export default function SignUp() {
               onChange={(e) => setLabel(e.target.value)}
               required
               // Custom styles applied: mt-1 for margin, bg-white, and consistent input styling
-              className="mt-1 h-10 w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 transition-colors"
+              className="mt-1 h-10 w-full rounded-md border-2 border-purple-200 bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] focus:border-[#6C5CE7] transition-colors"
             >
                 <option value="Experience Seeker">Experience Seeker</option>
                 <option value="Event Organiser">Event Organiser</option>
@@ -160,7 +158,7 @@ export default function SignUp() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
+              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -176,7 +174,7 @@ export default function SignUp() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-border text-foreground placeholder:text-muted-foreground`}
+              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
           
@@ -184,7 +182,7 @@ export default function SignUp() {
           <div className="text-left pt-2">
         <p className="text-muted-foreground text-sm font-medium">
           Already have an account?{" "}
-          <Link href="/signin" className="text-foreground hover:underline transition-colors">
+          <Link href="/signin" className="text-[#6C5CE7] hover:text-[#5B4BCF] hover:underline transition-colors">
             Sign In
           </Link>
         </p>
@@ -196,7 +194,7 @@ export default function SignUp() {
             type="submit"
             disabled={isLoading || password !== confirmPassword || !password}
             // Inlined base styles + outline variant styles
-            className={`${buttonBaseClasses} w-full border border-foreground bg-white text-foreground hover:bg-gray-50 hover:text-foreground transition-colors`}
+            className={`${buttonBaseClasses} w-full bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none`}
           >
             {isLoading ? (
               <>
@@ -223,7 +221,7 @@ export default function SignUp() {
           <button
             type="button"
             // Inlined base styles + outline variant styles
-            className={`${buttonBaseClasses} w-full border border-foreground bg-white text-foreground hover:bg-gray-50 hover:text-foreground transition-colors`}
+            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all`}
           >
             {/* Google Logo SVG - Set to text-foreground (black) */}
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">

@@ -7,7 +7,7 @@ import { useUser } from "@/contexts/UserContext";
 export default function EventGoerLayout({ children }) {
   const { currentUser } = useUser();
 
-  // No automatic dev login here. Use real auth flows for testing.
+  // Use real auth flows for production
 
   return (
     <>

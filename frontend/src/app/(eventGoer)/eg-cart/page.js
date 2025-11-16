@@ -2,7 +2,6 @@
 
 import { useEvents } from "@/contexts/EventsContext";
 import { useRouter } from "next/navigation";
-import Footer from "@/components/UI Components/Footer";
 import Button from "@/components/UI Components/Button";
 
 export default function CartPage() {
@@ -90,9 +89,7 @@ export default function CartPage() {
             </>
           )}
         </div>
-      </div>
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }
 

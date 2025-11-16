@@ -7,14 +7,15 @@ export default function Button({
   disabled = false,
   className = ""
 }) {
-  const baseStyles = "font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
   
   const variants = {
-    primary: "bg-black text-white hover:bg-gray-800",
-    secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
-    outline: "border-2 border-black text-black hover:bg-black hover:text-white",
-    danger: "bg-red-600 text-white hover:bg-red-700",
-    success: "bg-green-600 text-white hover:bg-green-700",
+    primary: "bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white hover:shadow-lg hover:scale-105",
+    secondary: "bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white hover:shadow-lg hover:scale-105",
+    tertiary: "bg-gradient-to-r from-[#00D9C0] to-[#00C4AC] text-white hover:shadow-lg hover:scale-105",
+    outline: "border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white",
+    danger: "bg-red-600 text-white hover:bg-red-700 hover:shadow-lg",
+    success: "bg-green-600 text-white hover:bg-green-700 hover:shadow-lg",
   };
 
   const sizes = {

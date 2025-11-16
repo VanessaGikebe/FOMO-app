@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Footer } from "@/components";
 
 export default function ModeratorEventDetailPage() {
   const router = useRouter();
@@ -20,7 +19,6 @@ export default function ModeratorEventDetailPage() {
           <p className="text-gray-600">Redirecting to manage events...</p>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

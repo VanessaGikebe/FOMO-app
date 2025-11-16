@@ -1,6 +1,3 @@
-"use client";
-
-import { Footer } from "@/components";
 
 import React, { useEffect } from "react";
 // MOCK useRouter:
@@ -24,9 +21,6 @@ export default function ModeratorOrganiserEventRedirectPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-8">Organiser Events</h1>
           <p className="text-gray-600">Organiser ID missing. Redirecting to Manage Organisers...</p>
         </div>
-      </div>
-      {/* --- Mock Footer Component --- */}
-      <Footer />
-    </div>
+      </div>    </div>
   );
 }

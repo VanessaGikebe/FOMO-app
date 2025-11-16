@@ -1,6 +1,5 @@
 "use client";
 
-import { Footer } from "@/components";
 import { useEvents } from '@/contexts/EventsContext';
 import EventCardComponent from '@/components/UI Components/EventCard';
 
@@ -9,7 +8,7 @@ export default function EventGoerDashboard() {
   const events = getAllEvents(false); // exclude flagged for public/event goer
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       <main className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <section className="mb-14">
@@ -53,8 +52,6 @@ export default function EventGoerDashboard() {
           </section>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

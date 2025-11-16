@@ -102,9 +102,9 @@ export default function EventCard({ event, userType = "public", userId = null })
 
   return (
     <Link href={getEventLink()}>
-      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-200 cursor-pointer">
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden border-2 border-purple-100 hover:border-[#6C5CE7] cursor-pointer hover:scale-[1.02] duration-200">
         {/* Event Image */}
-        <div className="relative h-48 bg-gray-200">
+        <div className="relative h-48 bg-gradient-to-br from-orange-50 to-purple-50">
           {image ? (
             // Use regular img tag for base64 images (Next.js Image component requires special config for base64)
             <img
@@ -122,7 +122,7 @@ export default function EventCard({ event, userType = "public", userId = null })
           {userType === "eventGoer" && (
             <button
               onClick={handleFavoriteToggle}
-              className="absolute top-3 left-3 bg-white rounded-full p-2 shadow-md hover:scale-110 transition-transform"
+              className="absolute top-3 left-3 bg-white rounded-full p-2 shadow-lg hover:scale-110 transition-transform border-2 border-pink-200"
               aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
             >
               <span className="text-xl">
@@ -135,7 +135,7 @@ export default function EventCard({ event, userType = "public", userId = null })
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             {/* Category Badge */}
             {category && (
-              <span className="bg-black text-white px-3 py-1 rounded-full text-xs font-medium">
+              <span className="bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 {category}
               </span>
             )}
@@ -143,7 +143,7 @@ export default function EventCard({ event, userType = "public", userId = null })
             {/* Flagged Badge (for organiser and moderator) */}
             {isFlagged && (userType === "eventOrganiser" || userType === "moderator") && (
               <span 
-                className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-medium cursor-help"
+                className="bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-1 rounded-full text-xs font-semibold cursor-help shadow-lg"
                 title={event.flagReason ? `Reason: ${event.flagReason}` : "Event has been flagged"}
               >
                 ⚠ Flagged
@@ -152,7 +152,7 @@ export default function EventCard({ event, userType = "public", userId = null })
             
             {/* Owner Badge (for organisers viewing their own events) */}
             {isOwner && userType === "eventOrganiser" && (
-              <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+              <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 Your Event
               </span>
             )}
@@ -166,7 +166,7 @@ export default function EventCard({ event, userType = "public", userId = null })
           </h3>
           
           {description && (
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            <p className="text-gray-700 text-sm mb-4 line-clamp-2 font-medium">
               {description}
             </p>
           )}
@@ -174,7 +174,7 @@ export default function EventCard({ event, userType = "public", userId = null })
           <div className="space-y-2 mb-4">
             {/* Date & Time */}
             {date && (
-              <div className="flex items-center text-gray-700 text-sm">
+              <div className="flex items-center text-gray-700 text-sm font-medium">
                 <span className="mr-2">📅</span>
                 <span>{date} {time && `at ${time}`}</span>
               </div>
@@ -182,7 +182,7 @@ export default function EventCard({ event, userType = "public", userId = null })
 
             {/* Location */}
             {location && (
-              <div className="flex items-center text-gray-700 text-sm">
+              <div className="flex items-center text-gray-700 text-sm font-medium">
                 <span className="mr-2">📍</span>
                 <span className="line-clamp-1">{location}</span>
               </div>
@@ -190,7 +190,7 @@ export default function EventCard({ event, userType = "public", userId = null })
 
             {/* Attendees */}
             {attendees !== undefined && (
-              <div className="flex items-center text-gray-700 text-sm">
+              <div className="flex items-center text-gray-700 text-sm font-medium">
                 <span className="mr-2">👥</span>
                 <span>{attendees} attending</span>
               </div>
@@ -216,14 +216,14 @@ export default function EventCard({ event, userType = "public", userId = null })
               <div className="flex gap-2">
                 <button 
                   onClick={handleEditClick}
-                  className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  className="bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white px-3 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200"
                   title="Edit event"
                 >
                    Edit
                 </button>
                 <button 
                   onClick={handleDeleteClick}
-                  className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                  className="bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200"
                   title="Delete event"
                 >
                    Delete
@@ -235,7 +235,7 @@ export default function EventCard({ event, userType = "public", userId = null })
                 {isFlagged ? (
                   <button 
                     onClick={handleUnflagClick}
-                    className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    className="bg-gradient-to-r from-green-600 to-green-700 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200"
                     title="Remove flag"
                   >
                     ✓ Unflag
@@ -243,7 +243,7 @@ export default function EventCard({ event, userType = "public", userId = null })
                 ) : (
                   <button 
                     onClick={handleFlagClick}
-                    className="bg-orange-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
+                    className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white px-3 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200"
                     title="Flag event"
                   >
                     ⚠ Flag
@@ -252,7 +252,7 @@ export default function EventCard({ event, userType = "public", userId = null })
                 {isFlagged && (
                   <button 
                     onClick={handleDeleteClick}
-                    className="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                    className="bg-gradient-to-r from-red-600 to-red-700 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200"
                     title="Delete flagged event"
                   >
                     🗑️ Delete
@@ -260,7 +260,7 @@ export default function EventCard({ event, userType = "public", userId = null })
                 )}
               </div>
             ) : (
-              <button className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+              <button className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200">
                 View Details
               </button>
             )}

@@ -1,9 +1,12 @@
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { EventsProvider } from "@/contexts/EventsContext";
 import { UserProvider } from "@/contexts/UserContext";
 import {NotificationsProvider} from "@/contexts/NotifContext";
 import DevTools from "@/components/DevTools";
+import { Footer } from "@/components";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,11 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "FOMO - Find Your Next Event",
-  description: "Discover and attend amazing events",
-};
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -30,6 +28,7 @@ export default function RootLayout({ children }) {
           <UserProvider>
             <NotificationsProvider>
               {children}
+              <Footer />
               <DevTools />
             </NotificationsProvider>
           </UserProvider>

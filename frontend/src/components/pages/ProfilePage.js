@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
-import Footer from "../UI Components/Footer";
 import Button from "../UI Components/Button";
 
 // Default user data fallback - only essential fields from Firebase
@@ -317,8 +316,6 @@ export default function ProfilePage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

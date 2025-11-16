@@ -1,6 +1,5 @@
 "use client";
 
-import { Footer } from "@/components";
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
@@ -12,17 +11,17 @@ import { getEventMetrics, getEventsByOrganizer } from '@/lib/api';
 // Component for the Metric/Stat Cards with updated icons
 const MetricCard = ({ title, value, iconPath, isLoading = false }) => (
   <div className="w-full sm:w-1/3 p-2">
-    <div className="bg-gray-100 rounded-lg shadow-sm p-4 flex items-center space-x-4">
+    <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-4 border-2 border-purple-100 hover:border-[#6C5CE7] transition-all">
       {/* Icon Area */}
-      <div className="flex-shrink-0 bg-gray-300 rounded-full p-2">
-        <svg className="w-5 h-5 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <div className="flex-shrink-0 bg-gradient-to-br from-[#6C5CE7] to-[#5B4BCF] rounded-full p-2">
+        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           {!isLoading && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPath} />}
         </svg>
       </div>
       {/* Text/Value Area */}
       <div>
         <p className="text-sm font-medium text-gray-600">{title}</p>
-        <p className="text-2xl font-bold text-gray-900">
+        <p className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] to-[#6C5CE7] bg-clip-text text-transparent">
           {isLoading ? "..." : value}
         </p>
       </div>
@@ -33,13 +32,13 @@ const MetricCard = ({ title, value, iconPath, isLoading = false }) => (
 // Component for an individual Upcoming Event Card with the new design (rounded/hovering tag)
 const EventCard = ({ category = "Technology", title = "Event Title", venueDate = "2025-11-01", time = "09:00 AM", description = "Join us for the biggest tech conference of the year featuring industry leaders, cutting-edge innovation..." }) => (
   <div className="w-full sm:w-1/3 p-2 flex-shrink-0">
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-100 hover:border-[#6C5CE7] transition-all hover:shadow-xl">
       
       {/* Top Visual Area (Matches the design: light background, category tag, emoji) */}
-      <div className="relative pt-[65%] bg-gray-50 border-b border-gray-100"> 
+      <div className="relative pt-[65%] bg-gradient-to-br from-orange-50 to-teal-50 border-b border-gray-100"> 
         
         {/* Category Tag: UPDATED to be rounded and hovering */}
-        <div className="absolute top-4 right-4 bg-gray-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md"> 
+        <div className="absolute top-4 right-4 bg-gradient-to-r from-[#00D9C0] to-[#00C4AC] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg"> 
           {category}
         </div>
 
@@ -61,12 +60,12 @@ const EventCard = ({ category = "Technology", title = "Event Title", venueDate =
 
         {/* Date/Time (Small text with calendar icon) */}
         <div className="text-sm text-gray-600 flex items-center space-x-2 mb-6">
-          <svg className="w-5 h-5 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          <svg className="w-5 h-5 text-[#00D9C0] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           <span className="font-medium">{venueDate} | {time}</span> 
         </div>
 
         {/* View Event Button (Full width, Dark background) */}
-        <button className="w-full bg-gray-800 text-white text-sm py-2.5 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out font-semibold">
+        <button className="w-full bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
           View Event
         </button>
       </div>
@@ -77,10 +76,10 @@ const EventCard = ({ category = "Technology", title = "Event Title", venueDate =
 // Component for Quick Action Buttons
 const QuickActionButton = ({ title, iconPath, onClick }) => (
   <button onClick={onClick} className="w-full sm:w-1/4 p-2 flex-shrink-0">
-    <div className="bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center justify-center transition duration-150 ease-in-out h-32">
+    <div className="bg-white hover:bg-gradient-to-br hover:from-orange-50 hover:to-purple-50 rounded-lg shadow-lg p-4 flex flex-col items-center justify-center transition-all duration-200 h-32 border-2 border-purple-100 hover:border-[#FF6B35] hover:scale-105">
       {/* Icon */}
-      <div className="bg-gray-300 rounded-full p-2 mb-2">
-        <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <div className="bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-full p-2 mb-2">
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPath} />
         </svg>
       </div>
@@ -180,7 +179,7 @@ export default function EventOrganiserDashboard() {
     }
   };
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       
       {/* (Header component assumed to be here, based on original Organiser code) */}
       
@@ -190,7 +189,7 @@ export default function EventOrganiserDashboard() {
           
           {/* 1. Digital Event Metrics Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Digital Event Metrics</h2>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Digital Event Metrics</h2>
             <p className="text-gray-600 mb-6">Understand how visitors interact with your events</p>
             
             <div className="flex flex-wrap -m-2">
@@ -217,7 +216,7 @@ export default function EventOrganiserDashboard() {
           
           {/* 2. My Upcoming Events Section (Uses the updated EventCard) */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">My Upcoming Events</h2>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">My Upcoming Events</h2>
             <p className="text-gray-600 mb-6">Review scheduled events to refine marketing and update key details</p>
             
             <div className="flex flex-wrap -m-2">
@@ -238,7 +237,7 @@ export default function EventOrganiserDashboard() {
           
           {/* 3. Quick Actions Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Quick Actions</h2>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent mb-1">Quick Actions</h2>
             <p className="text-gray-600 mb-6">Streamline your workflow with easy one-step actions</p>
             
             <div className="flex flex-wrap -m-2">
@@ -272,8 +271,6 @@ export default function EventOrganiserDashboard() {
         </div>
       </main>
 
-      {/* --- Footer Component --- */}
-      <Footer />
-    </div>
+      {/* --- Footer Component --- */}    </div>
   );
 }

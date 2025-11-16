@@ -1,13 +1,7 @@
 'use client';
 
-import { Footer } from "@/components";
-
-// MOCK useRouter: Replacing import { useRouter } from "next/navigation"
-const useRouter = () => ({
-    push: (path) => console.log(`Navigating to: ${path}`),
-    // Add other necessary router methods if needed
-});
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 
 // --- Organiser Row Component ---
 // Added 'id' and 'router' props
@@ -240,8 +234,6 @@ export default function ManageOrganisers() {
                 </div>
             </main>
 
-            {/* --- Mock Footer Component --- */}
-            <Footer />
         </div>
     );
 } 

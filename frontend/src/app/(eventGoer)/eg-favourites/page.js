@@ -3,7 +3,6 @@
 import { useUser } from "@/contexts/UserContext";
 import { useEvents } from "@/contexts/EventsContext";
 import EventCard from "@/components/UI Components/EventCard";
-import { Footer } from "@/components";
 
 export default function FavouritesPage() {
   const { currentUser } = useUser();
@@ -61,9 +60,6 @@ export default function FavouritesPage() {
             </div>
           )}
         </div>
-      </section>
-
-      <Footer />
-    </div>
+      </section>    </div>
   );
 }
