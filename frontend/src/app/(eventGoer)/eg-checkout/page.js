@@ -84,23 +84,41 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Submit order to backend
+      const orderResult = await submitTicketOrder(
+        cartItems,
+        currentUser?.id || "guest"
+      );
+      
+      // Check order status
+      if (orderResult.status === "insufficient_stock") {
+        alert("Sorry! Some items in your cart are no longer available. Please review and try again.");
+        router.push("/eg-cart");
+        return;
+      }
 
+      if (orderResult.status !== "ok") {
+        alert("Order processing failed. Please try again.");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Simulate payment processing (after successful order creation)
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Clear cart after successful payment
       if (typeof clearCart === 'function') {
         clearCart();
       }
       
-      // Show success message
-      alert("Payment successful! Your tickets have been confirmed.");
+      // Show success message with order ID
+      alert(`Payment successful! Your order #${orderResult.orderId} has been confirmed.\nYour tickets have been reserved.`);
       
       // Redirect to events page
       router.push("/eg-events");
     } catch (error) {
       console.error("Payment error:", error);
-      alert("Payment failed. Please try again.");
+      alert(`Payment failed: ${error.message || "Please try again."}`);
       setIsProcessing(false);
     }
   };

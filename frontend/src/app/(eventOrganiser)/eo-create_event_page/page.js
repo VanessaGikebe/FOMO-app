@@ -10,23 +10,29 @@ export default function CreateEventPage() {
   const { createEvent } = useEvents();
   const { currentUser } = useUser();
 
-  const handleSubmit = (formData) => {
+  const handleSubmit = async (formData) => {
     // Add organizer info to the event
     const eventData = {
       ...formData,
-      organizerId: currentUser?.id || "org001",
-      organizerName: currentUser?.name || "Tech Events Kenya",
+      
+      organizerId: currentUser?.uid || null,
+      organizerName: currentUser?.name || '',
       image: null
     };
 
-    // Create the event
-    const newEvent = createEvent(eventData);
-    
-    // Show success message
-    alert(`Event "${newEvent.title}" created successfully!`);
-    
-    // Redirect to manage events page
-    router.push("/eo-manageEvents");
+    try {
+      // Create the event (writes to Firestore)
+      const newEvent = await createEvent(eventData);
+
+      // Show success message
+      alert(`Event "${newEvent.title || eventData.title}" created successfully!`);
+
+      // Redirect to manage events page
+      router.push("/eo-manageEvents");
+    } catch (err) {
+      console.error('Failed to create event', err);
+      alert('Failed to create event. Please try again.');
+    }
   };
 
   const handleCancel = () => {
