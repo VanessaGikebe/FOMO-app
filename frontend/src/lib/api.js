@@ -13,19 +13,19 @@ export async function testBackendConnection() {
     const response = await fetch(`${API_BASE_URL}/test`, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
-    
+
     if (response.ok) {
       const text = await response.text();
-      console.log('✅ Backend connection successful:', text);
+      console.log("✅ Backend connection successful:", text);
       return true;
     }
   } catch (err) {
-    console.error('❌ Backend connection failed:', err);
+    console.error("❌ Backend connection failed:", err);
   }
-  
+
   return false;
 }
 
@@ -119,7 +119,7 @@ export async function getUserOrders(userId) {
  */
 export async function updateUserRole(userId, role, authToken) {
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
 
   if (authToken) {
@@ -129,12 +129,14 @@ export async function updateUserRole(userId, role, authToken) {
   const response = await fetch(`${API_BASE_URL}/auth/set-role`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ userId, role })
+    body: JSON.stringify({ userId, role }),
   });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    return { error: error.message || `Failed to update role: ${response.statusText}` };
+    return {
+      error: error.message || `Failed to update role: ${response.statusText}`,
+    };
   }
 
   return await response.json();
@@ -154,13 +156,15 @@ export async function getCurrentUser(authToken) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${authToken}`
-    }
+      Authorization: `Bearer ${authToken}`,
+    },
   });
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    return { error: error.message || `Failed to fetch user: ${response.statusText}` };
+    return {
+      error: error.message || `Failed to fetch user: ${response.statusText}`,
+    };
   }
 
   return await response.json();
@@ -212,24 +216,27 @@ export async function createOrganizerEvent(eventData, authToken = null) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}/events`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(eventData),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/events`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(eventData),
+    });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: response.statusText }));
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: response.statusText }));
       throw new Error(
         errorData.message || `Failed to create event: ${response.statusText}`
       );
     }
 
     const result = await response.json();
-    console.log('Event created successfully:', result);
+    console.log("Event created successfully:", result);
     return result;
   } catch (err) {
-    console.error('createOrganizerEvent error:', err);
+    console.error("createOrganizerEvent error:", err);
     throw err;
   }
 }
