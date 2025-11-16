@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useNotifications } from "@/contexts/NotifContext";
+import {
+  Image as ImageIcon,
+  User as UserIcon,
+  Bell as BellIcon,
+} from "lucide-react";
 
 export default function Navbar({ userType = "public" }) {
   const pathname = usePathname();
@@ -69,11 +74,13 @@ export default function Navbar({ userType = "public" }) {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-[#FF6B35] to-[#6C5CE7] rounded flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span className="text-lg">📸</span>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+              <ImageIcon className="w-5 h-5 text-gray-600" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-[#FF6B35] via-[#6C5CE7] to-[#00D9C0] bg-clip-text text-transparent">{config.logo}</span>
+            <span className="text-xl font-bold text-gray-900">
+              {config.logo}
+            </span>
           </Link>
 
           {/* Navigation Links */}
@@ -125,9 +132,12 @@ export default function Navbar({ userType = "public" }) {
                 title="Notifications"
                 aria-label="Notifications"
               >
-                <span className="text-xl" aria-hidden>🔔</span>
+                <BellIcon className="w-5 h-5 text-gray-700" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-lg" aria-live="polite">
+                  <span
+                    className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                    aria-live="polite"
+                  >
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
@@ -142,10 +152,13 @@ export default function Navbar({ userType = "public" }) {
                   className="w-10 h-10 bg-gradient-to-br from-purple-50 to-teal-50 rounded-full flex items-center justify-center hover:from-purple-100 hover:to-teal-100 transition-all hover:scale-110 border border-purple-200"
                   title="Profile"
                 >
-                  <span className="text-xl">👤</span>
+                  <UserIcon className="w-5 h-5 text-gray-700" />
                 </Link>
-                <Link href="/Home" className="bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white px-6 py-2 rounded-lg text-sm font-medium hover:shadow-lg hover:scale-105 transition-all duration-200">
-                    Sign Out
+                <Link
+                  href="/Home"
+                  className="bg-black text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                >
+                  Sign Out
                 </Link>
               </>
             )}

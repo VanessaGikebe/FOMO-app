@@ -1,5 +1,6 @@
 import Button from "../UI Components/Button";
 import Link from "next/link";
+import { Users, Compass, Globe } from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -19,12 +20,17 @@ export default function AboutPage() {
       {/* Our Story Section */}
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            OUR STORY
-          </h2>
-          <p className="text-[#FF6B35] font-semibold mb-6">How a Missed Party Sparked a Movement</p>
-          <p className="text-gray-800 leading-relaxed font-medium">
-            FOMO began with a simple realization — people were constantly missing out on great events because they didn't know where to look. What started as a small idea among friends grew into a mission to make event discovery effortless and inclusive. Today, FOMO connects users to experiences of all kinds, helping them find, share, and never miss what matters most.
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">OUR STORY</h2>
+          <p className="text-gray-600 mb-6">
+            How a Missed Party Sparked a Movement
+          </p>
+          <p className="text-gray-700 leading-relaxed">
+            FOMO began with a simple realization — people were constantly
+            missing out on great events because they didn't know where to look.
+            What started as a small idea among friends grew into a mission to
+            make event discovery effortless and inclusive. Today, FOMO connects
+            users to experiences of all kinds, helping them find, share, and
+            never miss what matters most.
           </p>
         </div>
       </section>
@@ -34,7 +40,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="bg-gradient-to-br from-purple-100 to-teal-100 h-64 rounded-lg border-2 border-[#6C5CE7]">
-              <img 
+              <img
                 src="/vision.jpg"
                 alt="vision depiction"
                 className="rounded-lg object-cover w-full h-full"
@@ -44,9 +50,16 @@ export default function AboutPage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-4">
                 OUR VISION
               </h2>
-              <p className="text-[#6C5CE7] font-semibold mb-6">A World Where No One Misses Out</p>
-              <p className="text-gray-800 leading-relaxed font-medium">
-                Our vision is to create a world where everyone has access to the events and experiences that inspire them. FOMO strives to become the leading platform for discovering what's happening anywhere, anytime — helping people stay connected, engaged, and part of something bigger. We believe that every moment worth sharing should be just one tap away.
+              <p className="text-gray-600 mb-6">
+                A World Where No One Misses Out
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                Our vision is to create a world where everyone has access to the
+                events and experiences that inspire them. FOMO strives to become
+                the leading platform for discovering what's happening anywhere,
+                anytime — helping people stay connected, engaged, and part of
+                something bigger. We believe that every moment worth sharing
+                should be just one tap away.
               </p>
             </div>
           </div>
@@ -61,13 +74,20 @@ export default function AboutPage() {
               <h2 className="text-4xl font-bold text-gray-900 mb-4">
                 OUR MISSION
               </h2>
-              <p className="text-[#00D9C0] font-semibold mb-6">Connecting People Through Shared Experiences</p>
-              <p className="text-gray-800 leading-relaxed font-medium">
-                At FOMO, our mission is to bring people closer to the moments that make life exciting. We aim to simplify event discovery by giving users a single place to explore what's happening around them — from concerts and meetups to festivals and workshops. By connecting people through shared interests and real-world experiences, we help communities grow and memories take shape.
+              <p className="text-gray-600 mb-6">
+                Connecting People Through Shared Experiences
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                At FOMO, our mission is to bring people closer to the moments
+                that make life exciting. We aim to simplify event discovery by
+                giving users a single place to explore what's happening around
+                them — from concerts and meetups to festivals and workshops. By
+                connecting people through shared interests and real-world
+                experiences, we help communities grow and memories take shape.
               </p>
             </div>
             <div className="bg-gradient-to-br from-orange-100 to-teal-100 h-64 rounded-lg border-2 border-[#00D9C0] order-1 md:order-2">
-              <img 
+              <img
                 src="/mission.jpg"
                 alt="mission depiction"
                 className="rounded-lg object-cover w-full h-full"
@@ -80,48 +100,52 @@ export default function AboutPage() {
       {/* Our Values Section */}
       <section className="py-16 px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Our Values
-          </h2>
-          <p className="text-gray-800 mb-12 font-medium">What drives us to keep people connected, curious, and involved.</p>
-          
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Values</h2>
+          <p className="text-gray-600 mb-12">
+            What drives us to keep people connected, curious, and involved.
+          </p>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Value Card 1 */}
             <div className="bg-gray-200 rounded-lg p-8 text-center">
               <div className="w-12 h-12 bg-gray-400 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-white text-xl">🤝</span>
+                <Users className="text-white w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 Community
               </h3>
-              <p className="text-gray-800 text-sm leading-relaxed font-medium">
-                We value meaningful connections and aim to bring people together through shared experiences that build a sense of belonging and fun.
+              <p className="text-gray-700 text-sm leading-relaxed">
+                We value meaningful connections and aim to bring people together
+                through shared experiences that build a sense of belonging and
+                fun.
               </p>
             </div>
 
             {/* Value Card 2 */}
             <div className="bg-gray-200 rounded-lg p-8 text-center">
               <div className="w-12 h-12 bg-gray-400 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-white text-xl">🧭</span>
+                <Compass className="text-white w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 Discovery
               </h3>
-              <p className="text-gray-800 text-sm leading-relaxed font-medium">
-                We inspire curiosity by helping users explore new events, interests, and opportunities that make every moment exciting.
+              <p className="text-gray-700 text-sm leading-relaxed">
+                We inspire curiosity by helping users explore new events,
+                interests, and opportunities that make every moment exciting.
               </p>
             </div>
 
             {/* Value Card 3 */}
             <div className="bg-gray-200 rounded-lg p-8 text-center">
               <div className="w-12 h-12 bg-gray-400 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-white text-xl">🌍</span>
+                <Globe className="text-white w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">
                 Accessibility
               </h3>
-              <p className="text-gray-800 text-sm leading-relaxed font-medium">
-                We believe everyone should have equal access to great experiences, no matter who they are or where they are.
+              <p className="text-gray-700 text-sm leading-relaxed">
+                We believe everyone should have equal access to great
+                experiences, no matter who they are or where they are.
               </p>
             </div>
           </div>
@@ -134,11 +158,15 @@ export default function AboutPage() {
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Get Started with FOMO
           </h2>
-          <p className="text-xl text-gray-800 mb-8 font-medium">
-            Join the community, explore events, and start making every moment count.
+          <p className="text-xl text-gray-600 mb-8">
+            Join the community, explore events, and start making every moment
+            count.
           </p>
           <Link href="/signup">
-            <Button variant="primary" className="bg-black text-white hover:bg-gray-800">
+            <Button
+              variant="primary"
+              className="bg-black text-white hover:bg-gray-800"
+            >
               Get Started
             </Button>
           </Link>

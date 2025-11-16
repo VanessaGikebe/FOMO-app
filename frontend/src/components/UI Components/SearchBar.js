@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { Search } from "lucide-react";
 
-export default function SearchBar({ 
-  placeholder = "Search events...", 
+export default function SearchBar({
+  placeholder = "Search events...",
   onSearch,
-  showFilters = false 
+  showFilters = false,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -20,7 +21,7 @@ export default function SearchBar({
     "Technology",
     "Business",
     "Health & Wellness",
-    "Education"
+    "Education",
   ];
 
   const handleSearch = (e) => {
@@ -29,7 +30,7 @@ export default function SearchBar({
       onSearch({
         searchTerm,
         category: selectedCategory,
-        location: selectedLocation
+        location: selectedLocation,
       });
     }
   };
@@ -86,9 +87,8 @@ export default function SearchBar({
               onChange={handleSearchTermChange}
               className="w-full px-5 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl">
-              🔍
-            </span>
+            {/* Lucide Magnifying Glass */}
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
           <button
             type="button"

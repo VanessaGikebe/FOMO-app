@@ -3,9 +3,16 @@
 import { useNotifications } from "@/contexts/NotifContext";
 import { useRouter } from "next/navigation";
 import Button from "@/components/UI Components/Button";
+import { Bell, BellRing } from "lucide-react"; // ✅ Lucide icons
 
 export default function NotificationsPage() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAllNotifications } = useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    clearAllNotifications,
+  } = useNotifications();
   const router = useRouter();
 
   const handleMarkAsRead = (notificationId) => {
@@ -23,7 +30,9 @@ export default function NotificationsPage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Notifications</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Notifications
+              </h1>
               <p className="text-gray-600">Never Miss a Moment</p>
             </div>
             {notifications.length > 0 && (
@@ -44,10 +53,12 @@ export default function NotificationsPage() {
           <div className="space-y-4">
             {notifications.length === 0 ? (
               <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-                <div className="mb-4">
-                  <span className="text-6xl">🔔</span>
+                <div className="mb-4 text-gray-400">
+                  <Bell className="w-16 h-16 mx-auto" />
                 </div>
-                <p className="text-gray-600 text-lg mb-2">No notifications yet</p>
+                <p className="text-gray-600 text-lg mb-2">
+                  No notifications yet
+                </p>
                 <p className="text-gray-500 text-sm">
                   Add events to your favorites to get reminders!
                 </p>
@@ -86,7 +97,8 @@ function NotificationCard({ notification, onMarkAsRead, onEventClick }) {
               {notification.eventTitle}
             </h3>
             {!notification.isRead && (
-              <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              <span className="flex items-center gap-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                <BellRing className="w-3 h-3" />
                 NEW
               </span>
             )}
@@ -117,8 +129,7 @@ function NotificationCard({ notification, onMarkAsRead, onEventClick }) {
             if (!notification.isRead) {
               onMarkAsRead(notification.id);
             }
-            // Navigate to event details
-             onEventClick(notification.eventId);
+            onEventClick(notification.eventId);
           }}
         >
           Mark As Read

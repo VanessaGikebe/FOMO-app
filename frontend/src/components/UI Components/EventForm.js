@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Button from "./Button";
+import { Image as ImageIcon } from "lucide-react";
 
-export default function EventForm({ 
-  initialData = null, 
-  onSubmit, 
+export default function EventForm({
+  initialData = null,
+  onSubmit,
   onCancel,
-  isEditing = false 
+  isEditing = false,
 }) {
   const [formData, setFormData] = useState({
     title: "",
@@ -19,7 +20,7 @@ export default function EventForm({
     price: 0,
     capacity: 100,
     tags: [],
-    image: null
+    image: null,
   });
 
   const [newTag, setNewTag] = useState("");
@@ -38,7 +39,7 @@ export default function EventForm({
         price: initialData.price || 0,
         capacity: initialData.capacity || 100,
         tags: initialData.tags || [],
-        image: initialData.image || null
+        image: initialData.image || null,
       });
       setImagePreview(initialData.image || null);
     }
@@ -46,26 +47,26 @@ export default function EventForm({
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === "number" ? parseFloat(value) || 0 : value
+      [name]: type === "number" ? parseFloat(value) || 0 : value,
     }));
   };
 
   const handleAddTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
       setNewTag("");
     }
   };
 
   const handleRemoveTag = (tagToRemove) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
@@ -82,9 +83,9 @@ export default function EventForm({
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result;
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          image: base64String
+          image: base64String,
         }));
         setImagePreview(base64String);
       };
@@ -93,9 +94,9 @@ export default function EventForm({
   };
 
   const handleRemoveImage = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      image: null
+      image: null,
     }));
     setImagePreview(null);
   };
@@ -114,7 +115,7 @@ export default function EventForm({
     "Business",
     "Education",
     "Entertainment",
-    "Other"
+    "Other",
   ];
 
   return (
@@ -142,7 +143,7 @@ export default function EventForm({
         ) : (
           <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center mb-3 border-2 border-dashed border-gray-300">
             <div className="text-center">
-              <span className="text-6xl text-gray-400">🎉</span>
+              <ImageIcon className="w-16 h-16 text-gray-400 mx-auto" />
               <p className="text-gray-500 mt-2">No image uploaded</p>
             </div>
           </div>
@@ -153,7 +154,9 @@ export default function EventForm({
           onChange={handleImageChange}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
         />
-        <p className="text-xs text-gray-500 mt-1">Max size: 5MB. Supported formats: JPG, PNG, GIF</p>
+        <p className="text-xs text-gray-500 mt-1">
+          Max size: 5MB. Supported formats: JPG, PNG, GIF
+        </p>
       </div>
 
       {/* Title */}
@@ -201,8 +204,10 @@ export default function EventForm({
             required
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
           >
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
         </div>
@@ -299,7 +304,9 @@ export default function EventForm({
             type="text"
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+            onKeyPress={(e) =>
+              e.key === "Enter" && (e.preventDefault(), handleAddTag())
+            }
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-gray-900"
             placeholder="Add tags to help people find your event"
           />
@@ -313,8 +320,8 @@ export default function EventForm({
         </div>
         <div className="flex flex-wrap gap-2">
           {formData.tags.map((tag, index) => (
-            <span 
-              key={index} 
+            <span
+              key={index}
               className="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm flex items-center gap-2"
             >
               {tag}
@@ -332,7 +339,11 @@ export default function EventForm({
 
       {/* Action Buttons */}
       <div className="flex gap-4 pt-6 border-t">
-        <Button type="submit" variant="primary" className="bg-black text-white hover:bg-gray-800">
+        <Button
+          type="submit"
+          variant="primary"
+          className="bg-black text-white hover:bg-gray-800"
+        >
           {isEditing ? "Update Event" : "Create Event"}
         </Button>
         {onCancel && (

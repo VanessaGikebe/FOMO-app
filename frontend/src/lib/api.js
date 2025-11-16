@@ -42,20 +42,20 @@ export async function submitTicketOrder(cartItems, userId = "guest") {
 
   const orderPayload = {
     userId,
-    cartItems: cartItems.map(item => ({
+    cartItems: cartItems.map((item) => ({
       eventId: item.eventId,
       ticketType: item.ticketType || "Standard",
       quantity: item.quantity,
-      pricePerTicket: item.pricePerTicket
-    }))
+      pricePerTicket: item.pricePerTicket,
+    })),
   };
 
   const response = await fetch(`${API_BASE_URL}/orders`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(orderPayload)
+    body: JSON.stringify(orderPayload),
   });
 
   if (!response.ok) {
@@ -75,8 +75,8 @@ export async function getOrder(orderId) {
   const response = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -96,8 +96,8 @@ export async function getUserOrders(userId) {
   const response = await fetch(`${API_BASE_URL}/orders/user/${userId}`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -174,16 +174,23 @@ export async function getCurrentUser(authToken) {
  * @returns {Promise<Array>} - Array of organizer's events
  */
 export async function getEventsByOrganizer(organizerId) {
-  const response = await fetch(`${API_BASE_URL}/events/organizer/${organizerId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
+  const response = await fetch(
+    `${API_BASE_URL}/events/organizer/${organizerId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     }
-  });
+  );
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    return { error: error.message || `Failed to fetch organizer events: ${response.statusText}` };
+    return {
+      error:
+        error.message ||
+        `Failed to fetch organizer events: ${response.statusText}`,
+    };
   }
 
   const events = await response.json();
@@ -198,21 +205,18 @@ export async function getEventsByOrganizer(organizerId) {
  */
 export async function createOrganizerEvent(eventData, authToken = null) {
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
-  
+
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  try {
-    console.log('Creating event:', { url: `${API_BASE_URL}/events`, eventData });
-    
-    const response = await fetch(`${API_BASE_URL}/events`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(eventData)
-    });
+  const response = await fetch(`${API_BASE_URL}/events`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(eventData),
+  });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: response.statusText }));
@@ -239,8 +243,8 @@ export async function getEventDetails(eventId) {
   const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -257,11 +261,15 @@ export async function getEventDetails(eventId) {
  * @param {string} authToken - Firebase auth token (optional)
  * @returns {Promise<Object>} - Updated event
  */
-export async function updateOrganizerEvent(eventId, updateData, authToken = null) {
+export async function updateOrganizerEvent(
+  eventId,
+  updateData,
+  authToken = null
+) {
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
-  
+
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
@@ -269,7 +277,7 @@ export async function updateOrganizerEvent(eventId, updateData, authToken = null
   const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
     method: "PATCH",
     headers,
-    body: JSON.stringify(updateData)
+    body: JSON.stringify(updateData),
   });
 
   if (!response.ok) {
@@ -290,16 +298,16 @@ export async function updateOrganizerEvent(eventId, updateData, authToken = null
  */
 export async function deleteOrganizerEvent(eventId, authToken = null) {
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
-  
+
   if (authToken) {
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
   const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
     method: "DELETE",
-    headers
+    headers,
   });
 
   if (!response.ok) {
@@ -321,8 +329,8 @@ export async function getEventMetrics(eventId) {
   const response = await fetch(`${API_BASE_URL}/events/${eventId}/metrics`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
