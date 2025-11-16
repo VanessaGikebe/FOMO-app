@@ -78,7 +78,7 @@ export default function Navbar({ userType = "public" }) {
             <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
               <ImageIcon className="w-5 h-5 text-gray-600" />
             </div>
-            <span className="text-xl font-bold text-gray-900">
+            <span className="text-xl font-bold text-[#FF6B35]">
               {config.logo}
             </span>
           </Link>
@@ -92,7 +92,7 @@ export default function Navbar({ userType = "public" }) {
                 className={`text-sm font-medium transition-colors ${
                   isActive(link.href)
                     ? "text-gray-900"
-                    : "text-gray-600 hover:text-gray-900"
+                    : "text-gray-700 hover:text-[#FF6B35]"
                 }`}
               >
                 {link.label}
