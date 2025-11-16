@@ -55,7 +55,7 @@ export default function PublicHome() {
             lasting memories
           </p>
           <Link href="/signin">
-            <button className="bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200">
+            <button className="bg-gradient-to-r from-[#FF6B35] to-[#FF6B35] text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200">
               Get Started
             </button>
           </Link>
@@ -82,7 +82,7 @@ export default function PublicHome() {
             </p>
             <div className="text-center">
               <Link href="/p-events">
-                <button className="bg-gradient-to-r from-[#00D9C0] to-[#00C4AC] text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200">
+                <button className="bg-gradient-to-r from-[#FF6B35] to-[#FF6B35] text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg hover:scale-105 transition-all duration-200">
                   Browse Events
                 </button>
               </Link>
@@ -114,7 +114,7 @@ export default function PublicHome() {
               <div className="text-black mb-4 flex justify-center">
                 <Smartphone className="w-12 h-12" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-[#FF6B35] mb-3">
                 Seamless Organization
               </h3>
               <p className="text-gray-600">
@@ -127,7 +127,7 @@ export default function PublicHome() {
               <div className="text-black mb-4 flex justify-center">
                 <LinkIcon className="w-12 h-12" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-[#FF6B35] mb-3">
                 Meaningful Connections
               </h3>
               <p className="text-gray-600">
@@ -140,7 +140,7 @@ export default function PublicHome() {
               <div className="text-black mb-4 flex justify-center">
                 <Lightbulb className="w-12 h-12" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl font-bold text-[#FF6B35] mb-3">
                 Smart Insights
               </h3>
               <p className="text-gray-600">
@@ -163,7 +163,7 @@ export default function PublicHome() {
             begins here.
           </p>
           <Link href="/signin">
-            <button className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] px-8 py-3 rounded-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <button className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] px-8 py-3 rounded-lg font-medium hover:shadow-xl hover:scale-105 transition-all duration-200 text-white">
               Get Started Today
             </button>
           </Link>
