@@ -4,7 +4,7 @@ import { useUser } from "@/contexts/UserContext";
 import { useEvents } from "@/contexts/EventsContext";
 import EventCard from "@/components/UI Components/EventCard";
 import { Footer } from "@/components";
-import { HeartCrack } from "lucide-react"; // ✅ Correct icon
+import { HeartCrack } from "lucide-react";
 
 export default function FavouritesPage() {
   const { currentUser } = useUser();
@@ -16,12 +16,12 @@ export default function FavouritesPage() {
     .filter((event) => event !== undefined);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       {/* Header Section */}
-      <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-16 px-6">
+      <section className="bg-gradient-to-br from-orange-50/80 via-purple-50/80 to-teal-50/80 text-gray-900 py-8 px-6  border-b border-gray-200">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">My Favourites</h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-gray-800 mb-8 font-medium">
             {favoriteEvents.length} event
             {favoriteEvents.length !== 1 ? "s" : ""} saved
           </p>

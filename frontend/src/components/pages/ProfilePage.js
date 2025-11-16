@@ -89,12 +89,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       {/* Profile Header */}
-      <section className="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-12 px-6">
+      <section className="bg-gradient-to-br from-orange-50/80 via-purple-50/80 to-teal-50/80 text-gray-900 py-16 px-6  border-b border-gray-200">
         <div className="max-w-4xl mx-auto flex items-center gap-6">
           {/* Avatar */}
-          <div className="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center">
+          <div className="w-32 h-32 bg-white border-2 border-black rounded-full flex items-center justify-center">
             {formData.avatar ? (
               <img
                 src={formData.avatar}
@@ -109,8 +109,8 @@ export default function ProfilePage() {
           {/* User Info */}
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-2">{formData.name}</h1>
-            <p className="text-gray-300 mb-4">{formData.email}</p>
-            <p className="text-gray-400 text-sm">
+            <p className=" text-gray-800 mb-4">{formData.email}</p>
+            <p className=" text-gray-800 text-sm">
               Member since {formData.joinedDate}
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function ProfilePage() {
           {!isEditing && (
             <Button
               variant="outline"
-              className="border-white text-white hover:bg-gray-700 hover:text-black"
+              className="border-black bg-black text-white hover:bg-[#FF6B35] hover:text-black"
               onClick={() => setIsEditing(true)}
             >
               Edit Profile
