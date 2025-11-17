@@ -128,7 +128,7 @@ export default function ProfilePage() {
       </section>
 
       {/* Profile Stats */}
-      <section className="py-8 px-6 bg-white border-b">
+      {/* <section className="py-8 px-6 bg-white border-b">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center p-6 bg-gray-50 rounded-xl">
             <p className="text-4xl font-bold text-gray-900">
@@ -149,7 +149,7 @@ export default function ProfilePage() {
             <p className="text-gray-600 mt-2">Favorite Events</p>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Profile Details */}
       <section className="py-12 px-6">
