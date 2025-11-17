@@ -71,7 +71,7 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       <div className="py-12 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-8">

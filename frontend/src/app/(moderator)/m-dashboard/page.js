@@ -1,12 +1,12 @@
 "use client";
 
 import { Footer } from "@/components";
-import { Eye, X, CheckCircle, Flag, EyeOff } from "lucide-react"; // ✅ Lucide icons
+import { Eye, X, CheckCircle, Flag, EyeOff, Calendar, PartyPopper, AlertTriangle } from "lucide-react";
 
 // Component for the Moderator Metric/Stat Cards
 const MetricCard = ({ title, value, Icon, iconColor, valueColor }) => (
   <div className="w-full sm:w-1/3 p-2">
-    <div className="bg-gray-100 rounded-lg shadow-sm p-6 flex flex-col space-y-3">
+    <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-4 border-2 border-orange-50 hover:border-[#FF6B35] transition-all">
       <div className="flex items-center space-x-3">
         <div
           className={`flex-shrink-0 rounded-full p-2`}
@@ -28,14 +28,14 @@ const MetricCard = ({ title, value, Icon, iconColor, valueColor }) => (
 // Component for an individual Event Card with Moderator actions
 const EventCard = ({ category, title, date, time, description }) => (
   <div className="w-full sm:w-1/3 p-2 flex-shrink-0">
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 h-full flex flex-col">
-      <div className="relative pt-[60%] bg-gray-50 border-b border-gray-100 flex items-center justify-center">
-        <div className="absolute top-4 right-4 bg-gray-900 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-orange-50 hover:border-[#FF6B35] transition-all hover:shadow-xl">
+      <div className="relative pt-[65%] bg-gradient-to-br from-orange-50 to-teal-50 border-b border-gray-100">
+        <div className="absolute top-4 right-4 bg-[#FF6B35] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
           {category}
         </div>
-        {/* Replacing 🎉 emoji with a simple icon placeholder */}
-        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-          <EyeOff className="w-10 h-10" />
+        {/* Replacing emoji with a simple icon placeholder */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <PartyPopper className="w-12 h-12" />
         </div>
       </div>
       <div className="p-4 flex-grow flex flex-col justify-between">
@@ -45,15 +45,15 @@ const EventCard = ({ category, title, date, time, description }) => (
             {description}
           </p>
           <div className="flex items-center text-sm font-medium text-gray-700 mb-4">
-            <Eye className="w-4 h-4 text-indigo-500 mr-2" />
+            <Calendar className="w-4 h-4 mr-2" />
             {date} | {time}
           </div>
         </div>
         <div className="flex space-x-2 pt-4 border-t border-gray-100 mt-auto">
-          <button className="flex-1 bg-gray-900 text-white text-sm py-2 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out font-semibold">
+          {/* <button className="flex-1 bg-black text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
             View Event
-          </button>
-          <button className="flex-1 bg-red-600 text-white text-sm py-2 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out font-semibold">
+          </button> */}
+          <button className="flex-1  bg-[#FF6B35] text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
             Flag Event
           </button>
         </div>
@@ -83,7 +83,7 @@ export default function ModeratorDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       <main className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* 1. Moderator Insights Section (Metrics) */}
@@ -99,29 +99,29 @@ export default function ModeratorDashboard() {
                 title="Viewers"
                 value="24"
                 Icon={Eye}
-                iconColor="#4B5563"
-                valueColor="#1F2937"
+                iconColor="#FF6B35"
+                valueColor="#FF6B35"
               />
               <MetricCard
                 title="Denied"
                 value="17"
                 Icon={X}
-                iconColor="#DC2626"
-                valueColor="#DC2626"
+                iconColor="#FF6B35"
+                valueColor="#FF6B35"
               />
               <MetricCard
                 title="Validated"
                 value="132"
                 Icon={CheckCircle}
-                iconColor="#10B981"
-                valueColor="#10B981"
+                iconColor="#FF6B35"
+                valueColor="#FF6B35"
               />
             </div>
           </section>
 
           {/* 2. Events to Moderate Section */}
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">
               Events to Moderate
             </h2>
             <p className="text-gray-600 mb-6">
@@ -156,7 +156,6 @@ export default function ModeratorDashboard() {
           </section>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

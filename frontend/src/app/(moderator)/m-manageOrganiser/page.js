@@ -214,7 +214,7 @@ export default function ManageOrganisers() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       {/* --- Main Header/Search Area --- */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -297,7 +297,6 @@ export default function ManageOrganisers() {
       </main>
 
       {/* --- Mock Footer Component --- */}
-      <Footer />
     </div>
   );
 }

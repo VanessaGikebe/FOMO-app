@@ -38,7 +38,7 @@ const EventCard = ({ category = "Technology", title = "Event Title", venueDate =
       <div className="relative pt-[65%] bg-gradient-to-br from-orange-50 to-teal-50 border-b border-gray-100"> 
         
         {/* Category Tag: UPDATED to be rounded and hovering */}
-        <div className="absolute top-4 right-4 bg-gradient-to-r from-[#00D9C0] to-[#00C4AC] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg"> 
+        <div className="absolute top-4 right-4 bg-[#FF6B35]text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg"> 
           {category}
         </div>
 
@@ -69,13 +69,13 @@ const EventCard = ({ category = "Technology", title = "Event Title", venueDate =
         </p>
 
         {/* Date/Time (Small text with calendar icon) */}
-        <div className="text-sm text-gray-600 flex items-center space-x-2 mb-6">
-          <svg className="w-5 h-5 text-[#00D9C0] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          <span className="font-medium">{venueDate} | {time}</span> 
-        </div>
+        <div className="flex items-center text-sm font-medium text-gray-700 mb-4">
+            <Calendar className="w-4 h-4 mr-2" />
+            {date} | {time}
+          </div>
 
         {/* View Event Button (Full width, Dark background) */}
-        <button className="w-full bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
+        <button className="w-full bg-[#FF6B35] text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
           View Event
         </button>
       </div>
