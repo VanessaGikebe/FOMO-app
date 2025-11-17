@@ -37,7 +37,6 @@ export class TicketsService {
     if (insufficient.length > 0) {
       return { status: 'insufficient_stock', details: insufficient };
     }
-
     // Generate order ID using auto-increment pattern from Firestore
     const ordersRef = this.db.collection('orders');
     const counterRef = this.db.collection('counters').doc('orderCounter');

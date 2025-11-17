@@ -16,11 +16,20 @@ export default function EventsPage({ userType = "public" }) {
 
   useEffect(() => {
     // Get events based on user type
-    // Public and eventGoer see only non-flagged events
-    // Organiser and moderator see all events
-    const includesFlagged =
-      userType === "eventOrganiser" || userType === "moderator";
-    const fetchedEvents = getAllEvents(includesFlagged);
+    let fetchedEvents = getAllEvents(false);
+    
+    // For event organisers, filter to only show their own events
+    if (userType === "eventOrganiser" && currentUser?.uid) {
+      fetchedEvents = fetchedEvents.filter(
+        (event) => event.organizerId === currentUser.uid
+      );
+    }
+    
+    // Moderators see all events including flagged
+    if (userType === "moderator") {
+      fetchedEvents = getAllEvents(true);
+    }
+    
     setAllEvents(fetchedEvents);
     setFilteredEvents(fetchedEvents);
   }, [userType, currentUser, events]); // Added 'events' dependency to re-render when events change
