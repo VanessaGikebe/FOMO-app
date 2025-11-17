@@ -66,8 +66,8 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                <ImageIcon className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                <img src="/FOMO LOGO.png" alt="FOMO Logo" className="w-10 h-10 object-contain"/>
               </div>
               <h1 className="bg-gradient-to-r from-[#FF6B35] via-[#FF6B35] to-[#FF6B35] bg-clip-text text-transparent text-xl font-bold">
                 FOMO

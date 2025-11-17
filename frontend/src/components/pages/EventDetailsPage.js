@@ -128,13 +128,13 @@ export default function EventDetailsPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Back */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <Link
             href={getBackLink()}
-            className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] text-white font-medium hover:shadow-lg hover:scale-105 transition-all"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Events
+            <ArrowLeft className="w-5 h-5" /> Back to Events
           </Link>
         </div>
       </div>
@@ -227,7 +227,7 @@ export default function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <Calendar className="w-6 h-6 text-gray-700" />
                   <div>
-                    <p className="font-semibold">Date & Time</p>
+                    <p className="font-semibold text-gray-900">Date & Time</p>
                     <p className="text-gray-600">{event.date}</p>
                     <p className="text-gray-600">{event.time}</p>
                   </div>
@@ -236,7 +236,7 @@ export default function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <MapPin className="w-6 h-6 text-gray-700" />
                   <div>
-                    <p className="font-semibold">Location</p>
+                    <p className="font-semibold text-gray-900">Location</p>
                     <p className="text-gray-600">{event.location}</p>
                     {event.address && (
                       <p className="text-sm text-gray-500">{event.address}</p>
@@ -247,7 +247,7 @@ export default function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <Users className="w-6 h-6 text-gray-700" />
                   <div>
-                    <p className="font-semibold">Attendees</p>
+                    <p className="font-semibold text-gray-900">Attendees</p>
                     <p className="text-gray-600">
                       {event.attendees} / {event.capacity} spots filled
                     </p>
@@ -257,7 +257,7 @@ export default function EventDetailsPage({
                 <div className="flex items-start gap-3">
                   <Building2 className="w-6 h-6 text-gray-700" />
                   <div>
-                    <p className="font-semibold">Organized by</p>
+                    <p className="font-semibold text-gray-900">Organized by</p>
                     <p className="text-gray-600">
                       {event.organizerName ||
                         event.organizer ||
@@ -368,7 +368,7 @@ export default function EventDetailsPage({
       {/* Description */}
       <section className="py-12 px-6 bg-white border-t">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6">About This Event</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">About This Event</h2>
           <div className="prose max-w-none whitespace-pre-line text-gray-700">
             {event.longDescription ||
               event.description ||
@@ -376,12 +376,12 @@ export default function EventDetailsPage({
           </div>
 
           <div className="mt-8">
-            <h3 className="text-xl font-bold mb-4">Tags</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {event.tags?.map((tag, index) => (
                 <span
                   key={index}
-                  className="bg-gray-100 px-4 py-2 rounded-full text-sm"
+                  className="bg-gray-100 px-4 py-2 rounded-full text-sm text-gray-800"
                 >
                   {tag}
                 </span>
