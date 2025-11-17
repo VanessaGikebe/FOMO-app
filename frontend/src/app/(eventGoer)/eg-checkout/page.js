@@ -5,11 +5,15 @@ import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "next/navigation";
 import Button from "@/components/UI Components/Button";
+import { CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 export default function CheckoutPage() {
   const { cartItems, getCartTotal, clearCart } = useEvents();
   const { currentUser } = useUser();
   const router = useRouter();
+
+  // Payment states
+  const [paymentStep, setPaymentStep] = useState("form"); // form, processing, success, error
 
   // Form state with pre-filled user data if available
   const [formData, setFormData] = useState({
@@ -23,6 +27,7 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentResult, setPaymentResult] = useState(null);
 
   // Redirect to cart if empty 
   useEffect(() => {
@@ -82,28 +87,40 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+    setPaymentStep("processing");
 
     try {
-      // Submit order to backend
+      // Simulate payment processing with stages
+      
+      // Stage 1: Process payment (1.5 seconds)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Simulate occasional failures (10% chance for demo)
+      if (Math.random() < 0.1) {
+        throw new Error("Payment declined. Please try again.");
+      }
+
+      // Stage 2: Create order (1 second)
       const orderResult = await submitTicketOrder(
         cartItems,
         currentUser?.id || "guest"
       );
       
-      // Check order status
       if (orderResult.status === "insufficient_stock") {
-        alert("Sorry! Some items in your cart are no longer available. Please review and try again.");
-        router.push("/eg-cart");
-        return;
-      }
-
-      if (orderResult.status !== "ok") {
-        alert("Order processing failed. Please try again.");
+        setPaymentResult({
+          status: "error",
+          message: "Sorry! Some items in your cart are no longer available. Please review and try again."
+        });
+        setPaymentStep("error");
         setIsProcessing(false);
         return;
       }
 
-      // Simulate payment processing (after successful order creation)
+      if (orderResult.status !== "ok") {
+        throw new Error("Order processing failed. Please try again.");
+      }
+
+      // Stage 3: Confirm order (1 second)
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Clear cart after successful payment
@@ -111,19 +128,127 @@ export default function CheckoutPage() {
         clearCart();
       }
       
-      // Show success message with order ID
-      alert(`Payment successful! Your order #${orderResult.orderId} has been confirmed.\nYour tickets have been reserved.`);
-      
-      // Redirect to events page
-      router.push("/eg-events");
+      // Show success
+      setPaymentResult({
+        status: "success",
+        orderId: orderResult.orderId,
+        message: `Payment successful! Your order #${orderResult.orderId} has been confirmed.`,
+        amount: getCartTotal()
+      });
+      setPaymentStep("success");
     } catch (error) {
       console.error("Payment error:", error);
-      alert(`Payment failed: ${error.message || "Please try again."}`);
+      setPaymentResult({
+        status: "error",
+        message: error.message || "Payment failed. Please try again."
+      });
+      setPaymentStep("error");
+    } finally {
       setIsProcessing(false);
     }
   };
 
   const totalAmount = getCartTotal();
+
+  // Payment Processing Screen
+  if (paymentStep === "processing") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
+          <div className="flex justify-center mb-6">
+            <div className="relative w-16 h-16">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] rounded-full animate-spin" style={{opacity: 0.3}}></div>
+              <Clock className="w-16 h-16 text-[#FF6B35] animate-pulse" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Processing Payment</h2>
+          <p className="text-gray-600 mb-6">Please wait while we process your payment securely...</p>
+          <p className="text-sm text-gray-500">This won't take long</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Payment Success Screen
+  if (paymentStep === "success" && paymentResult) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
+          <div className="flex justify-center mb-6">
+            <CheckCircle className="w-16 h-16 text-green-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h2>
+          <p className="text-gray-600 mb-4">Thank you for your purchase.</p>
+          
+          <div className="bg-gradient-to-r from-[#FF6B35] to-[#E55A2B] rounded-lg p-4 text-white mb-6">
+            <p className="text-sm text-white/80 mb-1">Order ID</p>
+            <p className="text-2xl font-bold mb-3">#{paymentResult.orderId}</p>
+            <p className="text-sm text-white/80">Total Paid: KShs {paymentResult.amount.toLocaleString()}</p>
+          </div>
+
+          <p className="text-gray-600 mb-6 text-sm">Your tickets have been reserved. Check your email for confirmation details.</p>
+          
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              size="large"
+              className="flex-1"
+              onClick={() => router.push("/eg-events")}
+            >
+              Continue Shopping
+            </Button>
+            <Button
+              variant="primary"
+              size="large"
+              className="flex-1"
+              onClick={() => router.push("/eg-orders")}
+            >
+              View Orders
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Payment Error Screen
+  if (paymentStep === "error" && paymentResult) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
+          <div className="flex justify-center mb-6">
+            <AlertCircle className="w-16 h-16 text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Failed</h2>
+          <p className="text-gray-600 mb-4 bg-red-50 p-4 rounded-lg border border-red-200">
+            {paymentResult.message}
+          </p>
+          
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              size="large"
+              className="flex-1"
+              onClick={() => {
+                setPaymentStep("form");
+                setPaymentResult(null);
+              }}
+            >
+              Try Again
+            </Button>
+            <Button
+              variant="primary"
+              size="large"
+              className="flex-1"
+              onClick={() => router.push("/eg-cart")}
+            >
+              Review Cart
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
 import { useRouter } from "next/navigation";
 import { getUserOrders } from "@/lib/api";
+import { generateTicketPDF } from "@/lib/ticketPdf";
 import Button from "@/components/UI Components/Button";
 import Footer from "@/components/UI Components/Footer";
-import { Calendar, MapPin, Ticket, Download, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Ticket, Download, ArrowLeft, Loader } from "lucide-react";
 import Link from "next/link";
 
 export default function OrderHistoryPage() {
@@ -121,6 +122,8 @@ export default function OrderHistoryPage() {
 }
 
 function OrderCard({ order }) {
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const formatDate = (date) => {
     if (!date) return "N/A";
     const d = new Date(date);
@@ -149,6 +152,35 @@ function OrderCard({ order }) {
     };
 
     return statusStyles[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    try {
+      // Mock event data - in a real app, this would come from the order
+      const mockEvent = {
+        id: order.eventId || "event-1",
+        title: "Event",
+        category: "Conference",
+        date: new Date().toLocaleDateString(),
+        time: "10:00 AM",
+        location: "Venue",
+        address: "123 Main St"
+      };
+
+      const mockUser = {
+        id: "user-1",
+        name: "Guest User",
+        email: "user@example.com"
+      };
+
+      await generateTicketPDF(order, mockEvent, mockUser);
+    } catch (error) {
+      console.error("Failed to download PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -197,8 +229,17 @@ function OrderCard({ order }) {
           </p>
         </div>
         <div className="flex gap-2">
-          <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
-            <Download className="w-5 h-5" />
+          <button 
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            title="Download ticket as PDF"
+          >
+            {isDownloading ? (
+              <Loader className="w-5 h-5 animate-spin" />
+            ) : (
+              <Download className="w-5 h-5" />
+            )}
           </button>
         </div>
       </div>
