@@ -128,13 +128,13 @@ export default function EventDetailsPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Back */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <Link
             href={getBackLink()}
-            className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+            className="text-[#FF6B35] hover:text-[#E55A2B] flex items-center gap-2 font-medium transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Back to Events
+            <ArrowLeft className="w-5 h-5" /> Back to Events
           </Link>
         </div>
       </div>
