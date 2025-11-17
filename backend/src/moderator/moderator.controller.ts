@@ -14,10 +14,19 @@ export class ModeratorController {
 	async getOrganisers(@Res() res: Response) {
 		try {
 			const db = admin.firestore();
-			// allow both spellings just in case some docs used 'organiser'
+			// Accept common role string variants present in Firestore (case-sensitive exact match)
+			const roleVariants = [
+				'Event Organiser',
+				'Event Organizer',
+				'organiser',
+				'organizer',
+				'event organiser',
+				'event organizer',
+			];
+
 			const snapshot = await db
 				.collection('users')
-				.where('role', 'in', ['organizer', 'organiser'])
+				.where('role', 'in', roleVariants)
 				.get();
 
 			const organisers = snapshot.docs.map((doc) => ({ id: doc.id, ...(doc.data() as any) }));
