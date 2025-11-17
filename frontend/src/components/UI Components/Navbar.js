@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useNotifications } from "@/contexts/NotifContext";
+import { useUser } from "@/contexts/UserContext";
 import {
   Image as ImageIcon,
   User as UserIcon,
@@ -12,15 +13,17 @@ import {
 export default function Navbar({ userType = "public" }) {
   const pathname = usePathname();
   const { unreadCount } = useNotifications();
+  const { currentUser } = useUser();
 
   // Define navigation items based on user type
   const navigationConfig = {
     public: {
       logo: "FOMO",
       links: [
-        { label: "Home", href: "/Home" },
-        { label: "Events", href: "/p-events" },
-        { label: "About", href: "/p-about" },
+        { label: "Home", href: "/Home#hero" },
+        { label: "Discover", href: "/Home#discover" },
+        { label: "Features", href: "/Home#features" },
+        { label: "About", href: "/Home#about" },
       ],
       authButtons: [
         { label: "Sign In", href: "/signin", variant: "text" },
@@ -70,7 +73,7 @@ export default function Navbar({ userType = "public" }) {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -90,11 +93,7 @@ export default function Navbar({ userType = "public" }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  isActive(link.href)
-                    ? "text-gray-900"
-                    : "text-gray-700 hover:text-[#FF6B35]"
-                }`}
+                className="text-sm font-medium transition-colors text-gray-700 hover:text-[#FF6B35]"
               >
                 {link.label}
               </Link>
@@ -103,6 +102,13 @@ export default function Navbar({ userType = "public" }) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
+            {/* User Greeting (for authenticated users) */}
+            {config.showProfile && currentUser?.name && (
+              <span className="text-sm font-medium text-gray-700">
+                Hi, {currentUser.name.split(' ')[0]}
+              </span>
+            )}
+
             {/* Auth Buttons (for public) */}
             {config.authButtons && (
               <>

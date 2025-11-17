@@ -3,18 +3,19 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { collection, onSnapshot, getDocs, addDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebaseClient';
+import { getAllEvents as fetchAllEvents, getEventDetails, createOrganizerEvent, updateOrganizerEvent as updateEventAPI, deleteOrganizerEvent } from '../lib/api';
 
 const EventsContext = createContext();
 
-// Start with no hard-coded events. Frontend will load events from Firestore in realtime.
+// Start with no hard-coded events. Frontend will load events from backend API.
 const initialEvents = [];
 
 export function EventsProvider({ children }) {
-  // Load events; start with built-in data on the server and hydrate on client.
+  // Load events from backend API
   const [events, setEvents] = useState(initialEvents);
+  const [loading, setLoading] = useState(true);
 
-  // Subscribe to Firestore `events` collection on client mount. If Firestore is unreachable
-  // we keep the initialEvents/local changes as a fallback.
+  // Fetch events from backend API on mount
   // Helper to normalize event documents coming from various sources
   const normalizeEvent = (docId, data = {}) => {
     // prefer explicit ids, fall back to docId
@@ -29,15 +30,25 @@ export function EventsProvider({ children }) {
     // date/time normalization: support separate fields or a Firestore Timestamp (start_date)
     let date = data.date || '';
     let time = data.time || '';
+    
+    // Handle Firestore timestamp objects that come from backend
     if (data.start_date) {
       try {
-        const d = (typeof data.start_date.toDate === 'function') ? data.start_date.toDate() : new Date(data.start_date);
+        let d;
+        // Check if it's a Firestore timestamp with _seconds
+        if (data.start_date._seconds) {
+          d = new Date(data.start_date._seconds * 1000);
+        } else if (typeof data.start_date.toDate === 'function') {
+          d = data.start_date.toDate();
+        } else {
+          d = new Date(data.start_date);
+        }
         date = d.toISOString().split('T')[0];
         // show HH:MM
         const hhmm = d.toTimeString().split(' ')[0].slice(0,5);
         time = hhmm;
       } catch (e) {
-        // ignore and keep existing date/time values
+        console.warn('Failed to parse start_date:', data.start_date, e);
       }
     }
 
@@ -66,29 +77,35 @@ export function EventsProvider({ children }) {
       attendees,
       capacity,
       tags,
-      // keep raw for debugging or advanced UI needs
-      _raw: data,
     };
   };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const col = collection(db, 'events');
-    let unsub = () => {};
-    try {
-      unsub = onSnapshot(col, (snapshot) => {
-        const docs = snapshot.docs.map(d => normalizeEvent(d.id, d.data()));
-        setEvents(docs);
-      }, (err) => {
-        // Firestore permission errors are expected if using backend API
-        // Frontend will fetch data through backend endpoints instead
-        console.warn('Firestore events subscription unavailable (using backend API instead):', err?.code || err?.message);
-      });
-    } catch (err) {
-      console.warn('Realtime events subscription failed, using backend API fallback:', err);
-      // keep initialEvents - backend API will provide data
-    }
-    return () => unsub();
+    
+    // Fetch events from backend API
+    const loadEvents = async () => {
+      console.log('🔄 Loading events from backend API...');
+      setLoading(true);
+      try {
+        const fetchedEvents = await fetchAllEvents();
+        console.log('✅ Fetched events from backend:', fetchedEvents);
+        const normalized = fetchedEvents.map(event => normalizeEvent(event.id, event));
+        console.log('✅ Normalized events:', normalized);
+        setEvents(normalized);
+      } catch (error) {
+        console.error('❌ Failed to load events from backend:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+
+    // Optional: Set up polling to refresh events periodically (every 30 seconds)
+    const intervalId = setInterval(loadEvents, 30000);
+    
+    return () => clearInterval(intervalId);
   }, []);
 
   // Get all events (with optional filtering for non-flagged)
@@ -109,69 +126,54 @@ export function EventsProvider({ children }) {
     return events.filter(event => event.organizerId === organizerId);
   };
 
-  // Create new event (writes to Firestore). Returns created event object.
-  const createEvent = async (eventData) => {
+  // Create new event (via backend API). Returns created event object.
+  const createEvent = async (eventData, authToken = null) => {
     try {
-      const payload = {
-        ...eventData,
-        isFlagged: false,
-        flagReason: "",
-        attendees: 0,
-        createdAt: serverTimestamp()
-      };
-      const ref = await addDoc(collection(db, 'events'), payload);
-
-      // ensure we also set canonical fields used elsewhere (event_id, organizer_id)
-      const organizerIdValue = payload.organizerId || payload.organizer_id || null;
-      await setDoc(doc(db, 'events', ref.id), { event_id: ref.id, organizer_id: organizerIdValue }, { merge: true });
-
-      // Build a normalized created object to return immediately; onSnapshot will sync canonical data
-      const createdRaw = { ...payload, event_id: ref.id, organizer_id: organizerIdValue };
-      const created = normalizeEvent(ref.id, createdRaw);
-      return created;
+      const result = await createOrganizerEvent(eventData, authToken);
+      
+      // Refresh events list after creation
+      const updatedEvents = await fetchAllEvents();
+      const normalized = updatedEvents.map(event => normalizeEvent(event.id, event));
+      setEvents(normalized);
+      
+      return result;
     } catch (err) {
-      console.error('Failed to create event in Firestore, falling back to local create:', err);
-      const newEvent = {
-        id: `evt${String(events.length + 1).padStart(3, '0')}`,
-        ...eventData,
-        isFlagged: false,
-        flagReason: "",
-        attendees: 0,
-        createdAt: new Date().toISOString()
-      };
-      setEvents(prevEvents => [...prevEvents, newEvent]);
-      return newEvent;
+      console.error('Failed to create event via backend:', err);
+      throw err;
     }
   };
 
-  // Update existing event (writes to Firestore)
-  const updateEvent = async (eventId, updatedData) => {
+  // Update existing event (via backend API)
+  const updateEvent = async (eventId, updatedData, authToken = null) => {
     try {
-      const ref = doc(db, 'events', eventId);
-      await updateDoc(ref, { ...updatedData, updatedAt: serverTimestamp() });
+      await updateEventAPI(eventId, updatedData, authToken);
+      
+      // Refresh events list after update
+      const updatedEvents = await fetchAllEvents();
+      const normalized = updatedEvents.map(event => normalizeEvent(event.id, event));
+      setEvents(normalized);
+      
       return true;
     } catch (err) {
-      console.error('Failed to update event in Firestore, applying local patch:', err);
-      setEvents(prevEvents => 
-        prevEvents.map(event => 
-          event.id === eventId 
-            ? { ...event, ...updatedData, updatedAt: new Date().toISOString() }
-            : event
-        )
-      );
-      return false;
+      console.error('Failed to update event via backend:', err);
+      throw err;
     }
   };
 
-  // Delete event (Firestore)
-  const deleteEvent = async (eventId) => {
+  // Delete event (via backend API)
+  const deleteEvent = async (eventId, authToken = null) => {
     try {
-      await deleteDoc(doc(db, 'events', eventId));
+      await deleteOrganizerEvent(eventId, authToken);
+      
+      // Refresh events list after deletion
+      const updatedEvents = await fetchAllEvents();
+      const normalized = updatedEvents.map(event => normalizeEvent(event.id, event));
+      setEvents(normalized);
+      
       return true;
     } catch (err) {
-      console.error('Failed to delete event from Firestore, removing locally:', err);
-      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
-      return false;
+      console.error('Failed to delete event via backend:', err);
+      throw err;
     }
   };
 
@@ -349,6 +351,7 @@ export function EventsProvider({ children }) {
 
   const value = {
     events,
+    loading,
     getAllEvents,
     getEventById,
     getEventsByOrganizer,

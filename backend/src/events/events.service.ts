@@ -21,11 +21,28 @@ export class EventsService {
   }
 
   async getEvents() {
+    // Fetch published events (status == "published")
     const snapshot = await this.db.collection('events')
-      .where('approved', '==', true)
-      .where('isFlagged', '==', false)
+      .where('status', '==', 'published')
       .get();
-    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    
+    console.log(`📊 Found ${snapshot.docs.length} published events in Firestore`);
+    
+    return snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return { 
+        id: doc.id, 
+        ...data,
+        // Map fields to match frontend expectations
+        organizerId: data.organizer_id || data.organizerId,
+        eventId: data.event_id || data.eventId || doc.id,
+        location: data.venue || data.location,
+        date: data.start_date,
+        // Set approved/isFlagged based on status for compatibility
+        approved: data.status === 'published',
+        isFlagged: false
+      };
+    });
   }
 
   async getEventById(id: string) {
