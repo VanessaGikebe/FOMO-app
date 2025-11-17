@@ -216,9 +216,9 @@ export default function ManageOrganisers() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
       {/* --- Main Header/Search Area --- */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-gradient-to-br from-orange-50/80 via-purple-50/80 to-teal-50/80 text-gray-900 py-8 px-6 border-b border-gray-200">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Moderate Organisers
           </h1>
           <p className="text-gray-600 mt-1">
