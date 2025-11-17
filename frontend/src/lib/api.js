@@ -2,7 +2,7 @@
  * API utility functions for frontend-backend communication
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:3002";
 
 /**
  * Test if backend is reachable
@@ -219,6 +219,235 @@ export async function getOrganisers() {
   } catch (err) {
     console.error('getOrganisers network error:', err);
     return { error: err && err.message ? err.message : String(err) };
+  }
+}
+
+/**
+ * Flag a user (organiser) via backend
+ * @param {string} userId
+ * @param {string} reason
+ * @param {string} moderatorId
+ * @returns {Promise<Object>}
+ */
+export async function flagUserAPI(userId, reason, moderatorId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/flag-user`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, reason, moderatorId }),
+    });
+
+    if (!response.ok) {
+      // Try to parse JSON error body, fallback to status text
+      const errorData = await response.json().catch(() => ({}));
+      const message = errorData.error || `HTTP ${response.status}`;
+      console.error('flagUserAPI HTTP error:', message);
+      return { error: message };
+    }
+
+    // Successful response — parse JSON if present
+    const text = await response.text();
+    try {
+      return JSON.parse(text || '{}');
+    } catch (parseErr) {
+      // If response is empty or not JSON, return success object
+      return { success: true };
+    }
+  } catch (err) {
+    console.error('flagUserAPI network error:', err);
+    return { error: err && err.message ? err.message : String(err) };
+  }
+}
+
+/**
+ * Unflag a user via backend
+ * @param {string} userId
+ * @param {string} moderatorId
+ * @returns {Promise<Object>}
+ */
+export async function unflagUserAPI(userId, moderatorId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/unflag-user`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, moderatorId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const message = errorData.error || `HTTP ${response.status}`;
+      console.error('unflagUserAPI HTTP error:', message);
+      return { error: message };
+    }
+
+    const text = await response.text();
+    try {
+      return JSON.parse(text || '{}');
+    } catch (parseErr) {
+      return { success: true };
+    }
+  } catch (err) {
+    console.error('unflagUserAPI network error:', err);
+    return { error: err && err.message ? err.message : String(err) };
+  }
+}
+
+/**
+ * Remove (delete) a user via backend (archive + delete)
+ * @param {string} userId
+ * @param {string} reason
+ * @param {string} moderatorId
+ * @returns {Promise<Object>}
+ */
+export async function removeUserAPI(userId, reason, moderatorId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/remove-user`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, reason, moderatorId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const message = errorData.error || `HTTP ${response.status}`;
+      console.error('removeUserAPI HTTP error:', message);
+      return { error: message };
+    }
+
+    const text = await response.text();
+    try {
+      return JSON.parse(text || '{}');
+    } catch (parseErr) {
+      return { success: true };
+    }
+  } catch (err) {
+    console.error('removeUserAPI network error:', err);
+    return { error: err && err.message ? err.message : String(err) };
+  }
+}
+
+/**
+ * Flag an event for moderation
+ * @param {string} eventId - Event ID
+ * @param {string} reason - Reason for flagging
+ * @param {string} moderatorId - Moderator user ID
+ * @returns {Promise<Object>} - Response with success status
+ */
+export async function flagEventAPI(eventId, reason, moderatorId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/flag`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId, reason, moderatorId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('flagEventAPI error:', err);
+    return { error: err.message || 'Failed to flag event' };
+  }
+}
+
+/**
+ * Unflag an event
+ * @param {string} eventId - Event ID
+ * @param {string} moderatorId - Moderator user ID
+ * @returns {Promise<Object>} - Response with success status
+ */
+export async function unflagEventAPI(eventId, moderatorId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/unflag`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventId, moderatorId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('unflagEventAPI error:', err);
+    return { error: err.message || 'Failed to unflag event' };
+  }
+}
+
+/**
+ * Delete a flagged event
+ * @param {string} eventId - Event ID
+ * @param {string} moderatorId - Moderator user ID
+ * @returns {Promise<Object>} - Response with success status
+ */
+export async function deleteEventAPI(eventId, moderatorId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/events/${eventId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ moderatorId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('deleteEventAPI error:', err);
+    return { error: err.message || 'Failed to delete event' };
+  }
+}
+
+/**
+ * Get all flagged events
+ * @returns {Promise<Array|Object>} - Array of flagged events or { error }
+ */
+export async function getFlaggedEventsAPI() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/flagged-events`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => response.statusText);
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('getFlaggedEventsAPI error:', err);
+    return { error: err.message || 'Failed to fetch flagged events' };
+  }
+}
+
+/**
+ * Get moderation logs
+ * @returns {Promise<Array|Object>} - Array of moderation logs or { error }
+ */
+export async function getModerationLogsAPI() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/logs`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => response.statusText);
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('getModerationLogsAPI error:', err);
+    return { error: err.message || 'Failed to fetch moderation logs' };
   }
 }
 

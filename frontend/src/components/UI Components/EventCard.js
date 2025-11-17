@@ -20,7 +20,7 @@ export default function EventCard({
   userType = "public",
   userId = null,
 }) {
-  const { isFavorite, addToFavorites, removeFromFavorites } = useUser();
+  const { isFavorite, addToFavorites, removeFromFavorites, currentUser } = useUser();
   const { deleteEvent, flagEvent, unflagEvent } = useEvents();
   const router = useRouter();
 
@@ -76,7 +76,7 @@ export default function EventCard({
         `Are you sure you want to delete "${title}"? This action cannot be undone.`
       )
     ) {
-      deleteEvent(id);
+      deleteEvent(id, currentUser?.uid);
       alert(`Event "${title}" has been deleted successfully!`);
     }
   };
@@ -86,7 +86,7 @@ export default function EventCard({
     e.stopPropagation();
     const reason = prompt(`Please provide a reason for flagging "${title}":`);
     if (reason !== null && reason.trim() !== "") {
-      flagEvent(id, reason);
+      flagEvent(id, reason, currentUser?.uid);
       alert(`Event "${title}" has been flagged successfully!`);
     } else if (reason !== null) alert("Flag reason is required.");
   };
@@ -95,7 +95,7 @@ export default function EventCard({
     e.preventDefault();
     e.stopPropagation();
     if (confirm(`Remove flag from "${title}"?`)) {
-      unflagEvent(id);
+      unflagEvent(id, currentUser?.uid);
       alert(`Event "${title}" has been unflagged successfully!`);
     }
   };

@@ -23,8 +23,8 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
  // await app.listen(3000);
-  await app.listen(3002);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  await app.listen(3002, '0.0.0.0');
+  console.log(`Application is running on: http://0.0.0.0:3002`);
 }
 
 void bootstrap();

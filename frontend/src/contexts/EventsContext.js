@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { collection, onSnapshot, getDocs, addDoc, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebaseClient';
+import { flagEventAPI, unflagEventAPI, deleteEventAPI } from '../lib/api';
 
 const EventsContext = createContext();
 
@@ -163,25 +164,69 @@ export function EventsProvider({ children }) {
     }
   };
 
-  // Delete event (Firestore)
-  const deleteEvent = async (eventId) => {
+  // Delete event (via backend API for moderator operations)
+  const deleteEvent = async (eventId, userId = null) => {
     try {
-      await deleteDoc(doc(db, 'events', eventId));
+      // Try backend first if we have user ID
+      if (userId) {
+        const result = await deleteEventAPI(eventId, userId);
+        if (result.error) {
+          console.warn('Backend delete failed, falling back to Firestore:', result.error);
+          // Fall back to direct Firestore delete
+          await deleteDoc(doc(db, 'events', eventId));
+        }
+      } else {
+        // No user ID, use direct Firestore delete
+        await deleteDoc(doc(db, 'events', eventId));
+      }
       return true;
     } catch (err) {
-      console.error('Failed to delete event from Firestore, removing locally:', err);
+      console.error('Failed to delete event:', err);
       setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
       return false;
     }
   };
 
-  // Flag event (moderator only)
-  const flagEvent = async (eventId, reason = "") => {
+  // Flag event (moderator only) - via backend API
+  const flagEvent = async (eventId, reason = "", userId = null) => {
     try {
-      await updateDoc(doc(db, 'events', eventId), { isFlagged: true, flagReason: reason });
+      if (!userId) {
+        console.warn('No user ID provided for flag operation');
+        // Still try to update locally
+        setEvents(prevEvents => 
+          prevEvents.map(event => 
+            event.id === eventId 
+              ? { ...event, isFlagged: true, flagReason: reason }
+              : event
+          )
+        );
+        return false;
+      }
+
+      const result = await flagEventAPI(eventId, reason, userId);
+      
+      if (result.error) {
+        console.error('Backend flag failed:', result.error);
+        // Fall back to direct Firestore update
+        await updateDoc(doc(db, 'events', eventId), { 
+          isFlagged: true, 
+          flagReason: reason,
+          flaggedBy: userId,
+          flaggedAt: new Date(),
+        });
+      }
+
+      // Update local state
+      setEvents(prevEvents => 
+        prevEvents.map(event => 
+          event.id === eventId 
+            ? { ...event, isFlagged: true, flagReason: reason, flaggedBy: userId }
+            : event
+        )
+      );
       return true;
     } catch (err) {
-      console.error('Failed to flag event in Firestore, applying locally:', err);
+      console.error('Failed to flag event:', err);
       setEvents(prevEvents => 
         prevEvents.map(event => 
           event.id === eventId 
@@ -193,13 +238,46 @@ export function EventsProvider({ children }) {
     }
   };
 
-  // Unflag event (moderator only)
-  const unflagEvent = async (eventId) => {
+  // Unflag event (moderator only) - via backend API
+  const unflagEvent = async (eventId, userId = null) => {
     try {
-      await updateDoc(doc(db, 'events', eventId), { isFlagged: false, flagReason: "" });
+      if (!userId) {
+        console.warn('No user ID provided for unflag operation');
+        // Still try to update locally
+        setEvents(prevEvents => 
+          prevEvents.map(event => 
+            event.id === eventId 
+              ? { ...event, isFlagged: false, flagReason: "" }
+              : event
+          )
+        );
+        return false;
+      }
+
+      const result = await unflagEventAPI(eventId, userId);
+      
+      if (result.error) {
+        console.error('Backend unflag failed:', result.error);
+        // Fall back to direct Firestore update
+        await updateDoc(doc(db, 'events', eventId), { 
+          isFlagged: false, 
+          flagReason: "",
+          unflaggedBy: userId,
+          unflaggedAt: new Date(),
+        });
+      }
+
+      // Update local state
+      setEvents(prevEvents => 
+        prevEvents.map(event => 
+          event.id === eventId 
+            ? { ...event, isFlagged: false, flagReason: "", unflaggedBy: userId }
+            : event
+        )
+      );
       return true;
     } catch (err) {
-      console.error('Failed to unflag event in Firestore, applying locally:', err);
+      console.error('Failed to unflag event:', err);
       setEvents(prevEvents => 
         prevEvents.map(event => 
           event.id === eventId 

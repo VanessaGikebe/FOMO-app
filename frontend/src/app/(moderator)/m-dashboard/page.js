@@ -1,7 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Footer } from "@/components";
 import { Eye, X, CheckCircle, Flag, EyeOff, Calendar, PartyPopper, AlertTriangle } from "lucide-react";
+import { useEvents } from "@/contexts/EventsContext";
+import { useUser } from "@/contexts/UserContext";
+import { getFlaggedEventsAPI, getModerationLogsAPI } from "@/lib/api";
 
 // Component for the Moderator Metric/Stat Cards
 const MetricCard = ({ title, value, Icon, iconColor, valueColor }) => (
@@ -26,45 +31,54 @@ const MetricCard = ({ title, value, Icon, iconColor, valueColor }) => (
 );
 
 // Component for an individual Event Card with Moderator actions
-const EventCard = ({ category, title, date, time, description }) => (
-  <div className="w-full sm:w-1/3 p-2 flex-shrink-0">
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-orange-50 hover:border-[#FF6B35] transition-all hover:shadow-xl">
-      <div className="relative pt-[65%] bg-gradient-to-br from-orange-50 to-teal-50 border-b border-gray-100">
-        <div className="absolute top-4 right-4 bg-[#FF6B35] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-          {category}
-        </div>
-        {/* Replacing emoji with a simple icon placeholder */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <PartyPopper className="w-12 h-12" />
-        </div>
-      </div>
-      <div className="p-4 flex-grow flex flex-col justify-between">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            {description}
-          </p>
-          <div className="flex items-center text-sm font-medium text-gray-700 mb-4">
-            <Calendar className="w-4 h-4 mr-2" />
-            {date} | {time}
+const EventCard = ({ event, onFlagClick }) => {
+  const date = event.date || event.start_date?.toDate?.()?.toISOString().split('T')[0] || 'N/A';
+  const time = event.time || '00:00';
+  const title = event.title || 'Untitled Event';
+  const category = event.category || 'Other';
+  const description = event.description || 'No description provided';
+  const isFlagged = event.isFlagged || false;
+  
+  return (
+    <div className="w-full sm:w-1/3 p-2 flex-shrink-0">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-orange-50 hover:border-[#FF6B35] transition-all hover:shadow-xl">
+        <div className="relative pt-[65%] bg-gradient-to-br from-orange-50 to-teal-50 border-b border-gray-100">
+          <div className={`absolute top-4 right-4 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg ${isFlagged ? 'bg-red-500' : 'bg-[#FF6B35]'}`}>
+            {isFlagged ? '🚩 FLAGGED' : category}
+          </div>
+          {/* Replacing emoji with a simple icon placeholder */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <PartyPopper className="w-12 h-12" />
           </div>
         </div>
-        <div className="flex space-x-2 pt-4 border-t border-gray-100 mt-auto">
-          {/* <button className="flex-1 bg-black text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
-            View Event
-          </button> */}
-          <button className="flex-1  bg-[#FF6B35] text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold">
-            Flag Event
-          </button>
+        <div className="p-4 flex-grow flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+              {description}
+            </p>
+            <div className="flex items-center text-sm font-medium text-gray-700 mb-4">
+              <Calendar className="w-4 h-4 mr-2" />
+              {date} | {time}
+            </div>
+          </div>
+          <div className="flex space-x-2 pt-4 border-t border-gray-100 mt-auto">
+            <button 
+              onClick={() => onFlagClick(event)}
+              className={`flex-1 text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold ${isFlagged ? 'bg-red-500' : 'bg-[#FF6B35]'}`}
+            >
+              {isFlagged ? 'Flagged ✓' : 'Flag Event'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Component for Quick Action Buttons
-const QuickActionButton = ({ title, Icon }) => (
-  <button className="w-full sm:w-1/5 p-2 flex-shrink-0">
+const QuickActionButton = ({ title, Icon, onClick }) => (
+  <button onClick={onClick} className="w-full sm:w-1/5 p-2 flex-shrink-0">
     <div className="bg-white hover:bg-gradient-to-br hover:from-orange-50 hover:to-purple-50 rounded-lg shadow-lg p-4 flex flex-col items-center justify-center transition-all duration-200 h-32 border-2 border-purple-100 hover:border-[#FF6B35] hover:scale-105">
       <div className="bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-full p-2 mb-2">
         <Icon className="w-6 h-6 text-white" />
@@ -76,11 +90,176 @@ const QuickActionButton = ({ title, Icon }) => (
 
 // --- Main Dashboard Component ---
 export default function ModeratorDashboard() {
-  const eventsToReview = [
-    { category: "Technology", title: "Tech Summit 2025" },
-    { category: "Music", title: "Live Music Gala" },
-    { category: "Food & Drink", title: "Gourmet Food Fair" },
-  ];
+  const router = useRouter();
+  const { currentUser } = useUser();
+  const { events, flagEvent } = useEvents();
+  
+  const [flaggedEvents, setFlaggedEvents] = useState([]);
+  const [moderationLogs, setModerationLogs] = useState([]);
+  const [stats, setStats] = useState({ viewed: 0, denied: 0, validated: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch flagged events and moderation logs on component mount
+  useEffect(() => {
+    if (!currentUser) return;
+    
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        // Fetch flagged events (initial)
+        const flaggedData = await getFlaggedEventsAPI();
+        if (!flaggedData.error) {
+          setFlaggedEvents(Array.isArray(flaggedData) ? flaggedData : []);
+        }
+        
+        // Fetch moderation logs to calculate stats
+        const logsData = await getModerationLogsAPI();
+        if (!logsData.error) {
+          const logs = Array.isArray(logsData) ? logsData : [];
+          setModerationLogs(logs);
+          
+          // Calculate stats from logs
+          const flagCount = logs.filter(log => log.action === 'FLAG_EVENT').length;
+          const unflagCount = logs.filter(log => log.action === 'UNFLAG_EVENT').length;
+          const deleteCount = logs.filter(log => log.action === 'DELETE_EVENT').length;
+          
+          setStats({
+            viewed: flagCount + unflagCount,
+            denied: deleteCount,
+            validated: logs.length
+          });
+        }
+        
+        setError(null);
+      } catch (err) {
+        console.error('Failed to load moderator data:', err);
+        setError('Failed to load moderator data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+
+    return () => {};
+  }, [currentUser]);
+
+  // Keep flaggedEvents in sync with the real-time `events` from EventsContext.
+  // This ensures the dashboard reflects unflag actions taken elsewhere (e.g. Manage Events)
+  useEffect(() => {
+    if (!events || !Array.isArray(events)) return;
+    const liveFlagged = events.filter(e => e.isFlagged);
+    setFlaggedEvents(liveFlagged);
+  }, [events]);
+
+  const handleFlagClick = async (event) => {
+    if (!currentUser) {
+      alert('Please sign in as a moderator');
+      return;
+    }
+    
+    if (event.isFlagged) {
+      alert(`This event is already flagged: ${event.flagReason || 'No reason provided'}`);
+      return;
+    }
+    
+    const reason = prompt('Enter reason for flagging this event:');
+    if (!reason) return;
+    
+    try {
+  // Prefer the normalized event.id (Firestore document id) from our normalizer
+  // Fall back to alternate id shapes in the raw document only if event.id is missing
+  const canonicalId = event?.id || event?._raw?.event_id || event?._raw?.eventId || event?._raw?.id;
+      const success = await flagEvent(canonicalId, reason, currentUser.uid);
+      if (success) {
+        alert(`Event "${event.title}" has been flagged successfully!`);
+        // Reload flagged events
+        const flaggedData = await getFlaggedEventsAPI();
+        if (!flaggedData.error) {
+          setFlaggedEvents(Array.isArray(flaggedData) ? flaggedData : []);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to flag event:', err);
+      alert('Failed to flag event. Please try again.');
+    }
+  };
+
+  // Quick action: view first flagged event (or notify if none)
+  const handleQuickView = () => {
+    if (flaggedEvents && flaggedEvents.length > 0) {
+      const first = flaggedEvents[0];
+      // navigate to public event details page
+      router.push(`/eg-events/${encodeURIComponent(first.id)}`);
+    } else {
+      alert('No flagged events to view');
+    }
+  };
+
+  // Quick action: flag an event by ID (prompt for ID and reason)
+  const handleQuickFlag = async () => {
+    if (!currentUser) {
+      alert('Please sign in as a moderator');
+      return;
+    }
+    // Ask for a title or substring instead of an opaque event ID — more intuitive
+    const query = prompt('Enter event title (or part of it) to flag:');
+    if (!query) return;
+
+    // Try to locate an event by exact id first, then by title substring (case-insensitive)
+    const trimmed = query.trim();
+    let candidate = events.find(ev => ev.id === trimmed);
+    if (!candidate) {
+      const lower = trimmed.toLowerCase();
+      candidate = events.find(ev => (ev.title || '').toLowerCase().includes(lower));
+    }
+
+    if (!candidate) {
+      alert(`No event found matching "${trimmed}". Use the event list to pick the correct item.`);
+      return;
+    }
+
+    if (candidate.isFlagged) {
+      alert(`Event "${candidate.title}" is already flagged.`);
+      return;
+    }
+
+    const reason = prompt(`Enter reason for flagging "${candidate.title}":`);
+    if (!reason) return;
+
+    try {
+      const canonicalId = candidate.id || candidate._raw?.event_id || candidate._raw?.eventId || candidate._raw?.id;
+      const success = await flagEvent(canonicalId, reason, currentUser.uid);
+      if (success) {
+        alert('Event flagged successfully');
+        const flaggedData = await getFlaggedEventsAPI();
+        if (!flaggedData.error) setFlaggedEvents(Array.isArray(flaggedData) ? flaggedData : []);
+      } else {
+        alert('Flag action did not complete — check console for details');
+      }
+    } catch (err) {
+      console.error('Quick flag failed:', err);
+      alert('Failed to flag event');
+    }
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-6">Please sign in as a moderator to access this dashboard</p>
+          <button 
+            onClick={() => router.push('/signin')}
+            className="bg-[#FF6B35] text-white px-6 py-3 rounded-lg hover:shadow-lg"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50">
@@ -96,22 +275,22 @@ export default function ModeratorDashboard() {
             </p>
             <div className="flex flex-wrap -m-2">
               <MetricCard
-                title="Viewers"
-                value="24"
+                title="Reviewed"
+                value={stats.viewed}
                 Icon={Eye}
                 iconColor="#FF6B35"
                 valueColor="#FF6B35"
               />
               <MetricCard
-                title="Denied"
-                value="17"
+                title="Deleted"
+                value={stats.denied}
                 Icon={X}
                 iconColor="#FF6B35"
                 valueColor="#FF6B35"
               />
               <MetricCard
-                title="Validated"
-                value="132"
+                title="Actions"
+                value={stats.validated}
                 Icon={CheckCircle}
                 iconColor="#FF6B35"
                 valueColor="#FF6B35"
@@ -124,21 +303,35 @@ export default function ModeratorDashboard() {
             <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">
               Events to Moderate
             </h2>
+            
             <p className="text-gray-600 mb-6">
-              Review new event submissions for compliance and content quality
+              Review and flag events for non-compliance
             </p>
-            <div className="flex flex-wrap -m-2">
-              {eventsToReview.map((event, index) => (
-                <EventCard
-                  key={index}
-                  category={event.category}
-                  title={event.title}
-                  description={`Review the submission details for the ${event.title} to ensure it meets all community standards and legal requirements.`}
-                  date="2025-11-20"
-                  time="10:00 AM"
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600">Loading events...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-12">
+                <p className="text-red-600">{error}</p>
+              </div>
+            ) : flaggedEvents.length > 0 ? (
+              <div className="flex flex-wrap -m-2">
+                {flaggedEvents.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    onFlagClick={handleFlagClick}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg p-8 text-center">
+                <AlertTriangle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
+                <p className="text-gray-600">No flagged events at the moment</p>
+                <p className="text-sm text-gray-500 mt-2">All events are in good standing</p>
+              </div>
+            )}
           </section>
 
           {/* 3. Quick Actions Section */}
@@ -150,8 +343,8 @@ export default function ModeratorDashboard() {
               Streamline your moderation workflow with easy one-step actions
             </p>
             <div className="flex flex-wrap -m-2">
-              <QuickActionButton title="View Event" Icon={Eye} />
-              <QuickActionButton title="Flag Event" Icon={Flag} />
+              <QuickActionButton title="View Event" Icon={Eye} onClick={handleQuickView} />
+              <QuickActionButton title="Flag Event" Icon={Flag} onClick={handleQuickFlag} />
             </div>
           </section>
         </div>

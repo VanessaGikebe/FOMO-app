@@ -3,11 +3,12 @@
 import { Footer } from "@/components";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useMemo } from "react";
-import { getOrganisers } from "@/lib/api";
+import { getOrganisers, flagUserAPI, unflagUserAPI, removeUserAPI } from "@/lib/api";
+import { useUser } from "@/contexts/UserContext";
 
 // --- Organiser Row Component ---
 // Added 'id' and 'onView' props
-const OrganiserRow = ({ id, name, email, onView }) => {
+const OrganiserRow = ({ id, name, email, isFlagged = false, flagReason = '', onView, onFlag, onUnflag, onRemove }) => {
   // Handler for navigating to the organiser's event list
   const handleViewEvents = () => {
     // Invoke the parent handler with the organiser ID
@@ -29,7 +30,7 @@ const OrganiserRow = ({ id, name, email, onView }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex space-x-3 w-full md:w-auto flex-shrink-0">
+      <div className="flex space-x-3 w-full md:w-auto flex-shrink-0 items-center">
         {/* View Events Button (Dark) - Now uses the click handler */}
         <button
           onClick={handleViewEvents}
@@ -37,10 +38,34 @@ const OrganiserRow = ({ id, name, email, onView }) => {
         >
           View Events
         </button>
-        {/* Flag User Button (Red) */}
-        <button className="flex-1 md:flex-none bg-[#FF6B35] text-white text-sm py-2 px-4 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out font-semibold">
-          Flag User
-        </button>
+        {/* Flag User Button / Flagged state */}
+          {isFlagged ? (
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-semibold text-red-600 bg-red-50 px-3 py-2 rounded-lg">Flagged</span>
+            {flagReason ? <span className="text-sm text-gray-500">{flagReason}</span> : null}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => onUnflag && onUnflag(id)}
+                className="ml-2 flex-1 md:flex-none bg-gray-200 text-gray-800 text-sm py-2 px-3 rounded-lg hover:bg-gray-300 transition duration-150 ease-in-out font-semibold"
+              >
+                Unflag
+              </button>
+              <button
+                onClick={() => onRemove && onRemove(id)}
+                className="ml-2 flex-1 md:flex-none bg-red-600 text-white text-sm py-2 px-3 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out font-semibold"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => onFlag && onFlag(id)}
+            className="flex-1 md:flex-none bg-[#FF6B35] text-white text-sm py-2 px-4 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out font-semibold"
+          >
+            Flag User
+          </button>
+        )}
       </div>
     </div>
   );
@@ -159,7 +184,9 @@ const Pagination = ({
 
 export default function ManageOrganisers() {
   const router = useRouter(); // Initialize router
+  const { currentUser } = useUser();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Set a small page limit for testing the pagination interface
   const ITEMS_PER_PAGE = 3;
@@ -189,6 +216,8 @@ export default function ManageOrganisers() {
           id: u.id,
           name: u.fullName || u.name || u.displayName || u.orgName || "",
           email: u.email || u.emailAddress || u.email_address || "",
+          isFlagged: u.isFlagged ?? false,
+          flagReason: u.flagReason || '',
         }));
         setAllOrganisers(normalized);
       } catch (err) {
@@ -203,12 +232,28 @@ export default function ManageOrganisers() {
     };
   }, []);
 
-  // Calculate current items to display
+  // Filter organisers according to search term
+  const filteredOrganisers = useMemo(() => {
+    if (!searchTerm || searchTerm.trim() === '') return allOrganisers;
+    const q = searchTerm.trim().toLowerCase();
+    return allOrganisers.filter((u) => {
+      const name = (u.name || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      return name.includes(q) || email.includes(q);
+    });
+  }, [allOrganisers, searchTerm]);
+
+  // Calculate current items to display (with pagination applied to filtered list)
   const currentOrganisers = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return allOrganisers.slice(startIndex, endIndex);
-  }, [allOrganisers, currentPage, ITEMS_PER_PAGE]);
+    return filteredOrganisers.slice(startIndex, endIndex);
+  }, [filteredOrganisers, currentPage, ITEMS_PER_PAGE]);
+
+  // Reset to first page whenever the search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handlePageChange = (page) => {
     // Ensure page stays within bounds
@@ -220,6 +265,107 @@ export default function ManageOrganisers() {
 
   const handleViewOrganiser = (organiserId) => {
     router.push(`/m-view_organiserEvent/${encodeURIComponent(organiserId)}`);
+  };
+
+  const handleFlagUser = async (organiserId) => {
+    if (!currentUser) {
+      alert('Please sign in as a moderator');
+      return;
+    }
+
+    const reason = prompt('Enter reason for flagging this user:');
+    if (!reason) return;
+
+    try {
+      const result = await flagUserAPI(organiserId, reason, currentUser.uid);
+      if (result && result.error) {
+        alert('Failed to flag user: ' + result.error);
+        return;
+      }
+      alert('User flagged successfully');
+      // Refresh organisers list
+      const data = await getOrganisers();
+      if (data && !data.error) {
+        const normalized = (data || []).map((u) => ({
+          id: u.id,
+          name: u.fullName || u.name || u.displayName || u.orgName || "",
+          email: u.email || u.emailAddress || u.email_address || "",
+          isFlagged: u.isFlagged ?? false,
+          flagReason: u.flagReason || '',
+        }));
+        setAllOrganisers(normalized);
+      }
+    } catch (err) {
+      console.error('Failed to flag user:', err);
+      alert('Failed to flag user. See console for details.');
+    }
+  };
+
+  const handleUnflagUser = async (organiserId) => {
+    if (!currentUser) {
+      alert('Please sign in as a moderator');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to unflag this user?')) return;
+
+    try {
+      const result = await unflagUserAPI(organiserId, currentUser.uid);
+      if (result && result.error) {
+        alert('Failed to unflag user: ' + result.error);
+        return;
+      }
+      alert('User unflagged successfully');
+      // Refresh organisers list
+      const data = await getOrganisers();
+      if (data && !data.error) {
+        const normalized = (data || []).map((u) => ({
+          id: u.id,
+          name: u.fullName || u.name || u.displayName || u.orgName || "",
+          email: u.email || u.emailAddress || u.email_address || "",
+          isFlagged: u.isFlagged ?? false,
+          flagReason: u.flagReason || '',
+        }));
+        setAllOrganisers(normalized);
+      }
+    } catch (err) {
+      console.error('Failed to unflag user:', err);
+      alert('Failed to unflag user. See console for details.');
+    }
+  };
+
+  const handleRemoveUser = async (organiserId) => {
+    if (!currentUser) {
+      alert('Please sign in as a moderator');
+      return;
+    }
+
+    const reason = prompt('Enter reason for removing this user (optional):');
+    if (!confirm('Are you sure you want to remove this user? This action will archive and delete the user.')) return;
+
+    try {
+      const result = await removeUserAPI(organiserId, reason || '', currentUser.uid);
+      if (result && result.error) {
+        alert('Failed to remove user: ' + result.error);
+        return;
+      }
+      alert('User removed successfully');
+      // Refresh organisers list
+      const data = await getOrganisers();
+      if (data && !data.error) {
+        const normalized = (data || []).map((u) => ({
+          id: u.id,
+          name: u.fullName || u.name || u.displayName || u.orgName || "",
+          email: u.email || u.emailAddress || u.email_address || "",
+          isFlagged: u.isFlagged ?? false,
+          flagReason: u.flagReason || '',
+        }));
+        setAllOrganisers(normalized);
+      }
+    } catch (err) {
+      console.error('Failed to remove user:', err);
+      alert('Failed to remove user. See console for details.');
+    }
   };
 
   return (
@@ -239,8 +385,11 @@ export default function ManageOrganisers() {
           <div className="mt-6">
             <input
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search for an organiser by name or email..."
               className="w-full p-3 border border-gray-300 rounded-lg shadow-inner focus:ring-indigo-500 focus:border-indigo-500"
+              aria-label="Search organisers by name or email"
             />
           </div>
         </div>
@@ -289,7 +438,12 @@ export default function ManageOrganisers() {
                   id={organiser.id} // Pass the ID
                   name={organiser.name}
                   email={organiser.email}
+                  isFlagged={organiser.isFlagged}
+                  flagReason={organiser.flagReason}
                   onView={handleViewOrganiser}
+                  onFlag={handleFlagUser}
+                  onUnflag={handleUnflagUser}
+                  onRemove={handleRemoveUser}
                 />
               ))}
             </div>

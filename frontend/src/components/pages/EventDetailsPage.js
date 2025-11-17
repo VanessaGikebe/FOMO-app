@@ -55,7 +55,7 @@ export default function EventDetailsPage({
     );
   }
 
-  const isOwner = isEventOwner(eventId || event.id, currentUser?.id);
+  const isOwner = isEventOwner(eventId || event.id, currentUser?.uid);
 
   const getBackLink = () => {
     switch (userType) {
@@ -101,7 +101,7 @@ export default function EventDetailsPage({
 
   const handleFlag = () => {
     if (!flagReason.trim()) return alert("Please provide a reason.");
-    flagEvent(event.id, flagReason);
+    flagEvent(event.id, flagReason, currentUser?.uid);
     alert(`Event "${event.title}" has been flagged!`);
     setShowFlagInput(false);
     setFlagReason("");
@@ -109,7 +109,7 @@ export default function EventDetailsPage({
 
   const handleUnflag = () => {
     if (confirm(`Remove flag from "${event.title}"?`)) {
-      unflagEvent(event.id);
+      unflagEvent(event.id, currentUser?.uid);
       alert(`Event "${event.title}" has been unflagged!`);
     }
   };
@@ -117,7 +117,7 @@ export default function EventDetailsPage({
   const handleDelete = () => {
     if (!event.isFlagged) return alert("Only flagged events can be deleted.");
     if (confirm(`Delete "${event.title}"? This cannot be undone.`)) {
-      deleteEvent(event.id);
+      deleteEvent(event.id, currentUser?.uid);
       alert(`Event "${event.title}" has been deleted.`);
       router.push(getBackLink());
     }
