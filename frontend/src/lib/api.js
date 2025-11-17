@@ -166,37 +166,6 @@ export async function getCurrentUser(authToken) {
   return await response.json();
 }
 
-// ============ EVENT DISCOVERY ============
-
-/**
- * Get all events from the backend
- * @param {boolean} includeUnapproved - Whether to include unapproved events (for organizers)
- * @returns {Promise<Array>} - Array of all events
- */
-export async function getAllEvents(includeUnapproved = false) {
-  try {
-    const endpoint = includeUnapproved 
-      ? `${API_BASE_URL}/events?includeUnapproved=true` 
-      : `${API_BASE_URL}/events`;
-    
-    const response = await fetch(endpoint, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.error('getAllEvents error:', err);
-    return []; // Return empty array on error
-  }
-}
-
 // ============ ORGANIZER EVENT MANAGEMENT ============
 
 /**
@@ -226,32 +195,6 @@ export async function getEventsByOrganizer(organizerId) {
 
   const events = await response.json();
   return events;
-}
-
-/**
- * Get all organisers (users with organizer role) from backend
- * @returns {Promise<Array>} - Array of organiser user objects
- */
-export async function getOrganisers() {
-  try {
-    const response = await fetch(`${API_BASE_URL}/moderator/organisers`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) {
-      const text = await response.text().catch(() => response.statusText);
-      const msg = `Failed to fetch organisers: ${response.status} ${text}`;
-      console.error('getOrganisers HTTP error:', msg);
-      return { error: msg };
-    }
-
-    return await response.json();
-  } catch (err) {
-    // Network-level errors (DNS, connection refused, CORS causing network failure)
-    console.error('getOrganisers network error:', err);
-    return { error: err && err.message ? err.message : String(err) };
-  }
 }
 
 /**
