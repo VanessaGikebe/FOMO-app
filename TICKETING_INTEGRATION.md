@@ -1,6 +1,6 @@
 # Frontend-Backend Integration: Ticketing System
 
-## ✅ What's Been Implemented
+## What's Been Implemented
 
 ### Backend (NestJS on Port 3002)
 - **Ticketing Module** (`src/tickets/`)
@@ -14,10 +14,10 @@
   - `GET /orders/user/:userId` - Get user's orders
   
 - **Features**:
-  - ✅ Order creation with inventory validation
-  - ✅ Returns order ID on success
-  - ✅ Handles insufficient stock errors
-  - ✅ Firebase/Firestore integration ready
+  -  Order creation with inventory validation
+  -  Returns order ID on success
+  -  Handles insufficient stock errors
+  -  Firebase/Firestore integration ready
 
 ### Frontend (Next.js on Port 3000)
 - **API Utility** (`src/lib/api.js`)
@@ -32,7 +32,7 @@
   - Clears cart after successful order
   - Shows order confirmation with order ID
 
-## 🧪 Testing the Flow
+##  Testing the Flow
 
 ### Prerequisites
 - Backend running: `cd backend && npm run start:dev` (port 3002)
@@ -69,7 +69,7 @@ When order is submitted, you should see in backend terminal:
 [Nest] ... LOG [TicketsService] Order created successfully
 ```
 
-## 📊 Response Examples
+##  Response Examples
 
 ### Successful Order Response
 ```json
@@ -107,7 +107,7 @@ When order is submitted, you should see in backend terminal:
 }
 ```
 
-## 🚀 Next Steps
+##  Next Steps
 
 ### Option 1: Firestore Persistence (Recommended)
 - Migrate order storage from in-memory to Firestore
@@ -124,7 +124,7 @@ When order is submitted, you should see in backend terminal:
 - Add order history page showing user's past orders
 - Display tickets/receipts per order
 
-## 📁 File Structure
+##  File Structure
 
 ```
 backend/src/
@@ -149,7 +149,7 @@ frontend/src/
     └── EventsContext.js (cart management)
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 ### Backend (.env)
 - `NODE_ENV=development`
@@ -159,12 +159,12 @@ frontend/src/
 ### Frontend (.env.local)
 - `NEXT_PUBLIC_API_URL=http://localhost:3002` (optional, defaults to localhost:3002)
 
-## ✨ Current Status
+##  Current Status
 
-- ✅ Backend ticketing API implemented and tested
-- ✅ Frontend checkout integrated with backend
-- ✅ Order creation working end-to-end
-- ✅ Error handling for insufficient stock
-- ✅ All tests passing (8 suites, 50+ tests)
-- ⏳ Firestore persistence (next iteration)
-- ⏳ User authentication integration (next iteration)
+-  Backend ticketing API implemented and tested
+-  Frontend checkout integrated with backend
+-  Order creation working end-to-end
+-  Error handling for insufficient stock
+-  All tests passing (8 suites, 50+ tests)
+-  Firestore persistence (next iteration)
+-  User authentication integration (next iteration)
