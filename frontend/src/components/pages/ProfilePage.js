@@ -118,7 +118,7 @@ export default function ProfilePage() {
           {!isEditing && (
             <Button
               variant="outline"
-              className="border-black bg-black text-white hover:bg-[#FF6B35] hover:text-black"
+              className="border-none bg-black text-white hover:bg-[#FF6B35] hover:text-black"
               onClick={() => setIsEditing(true)}
             >
               Edit Profile
@@ -315,7 +315,7 @@ export default function ProfilePage() {
                 <Button variant="primary" onClick={handleSave}>
                   Save Changes
                 </Button>
-                <Button variant="secondary" onClick={handleCancel}>
+                <Button variant="cancel" onClick={handleCancel}>
                   Cancel
                 </Button>
               </div>

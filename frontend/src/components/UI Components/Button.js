@@ -16,6 +16,7 @@ export default function Button({
     outline: "border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white",
     danger: "bg-red-600 text-white hover:bg-red-700 hover:shadow-lg",
     success: "bg-green-600 text-white hover:bg-green-700 hover:shadow-lg",
+    cancel: "bg-red-600 text-white hover:shadow-lg hover:scale-105"
   };
 
   const sizes = {
