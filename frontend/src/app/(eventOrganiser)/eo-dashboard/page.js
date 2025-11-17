@@ -11,9 +11,9 @@ import { getEventMetrics, getEventsByOrganizer } from '@/lib/api';
 // Component for the Metric/Stat Cards with updated icons
 const MetricCard = ({ title, value, iconPath, isLoading = false }) => (
   <div className="w-full sm:w-1/3 p-2">
-    <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-4 border-2 border-purple-100 hover:border-[#6C5CE7] transition-all">
+    <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-4 border-2 border-orange-50 hover:border-[#FF6B35] transition-all">
       {/* Icon Area */}
-      <div className="flex-shrink-0 bg-gradient-to-br from-[#6C5CE7] to-[#5B4BCF] rounded-full p-2">
+      <div className="flex-shrink-0 bg-[#FF6B35] rounded-full p-2">
         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           {!isLoading && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPath} />}
         </svg>
@@ -32,7 +32,7 @@ const MetricCard = ({ title, value, iconPath, isLoading = false }) => (
 // Component for an individual Upcoming Event Card with the new design (rounded/hovering tag)
 const EventCard = ({ category = "Technology", title = "Event Title", venueDate = "2025-11-01", time = "09:00 AM", description = "Join us for the biggest tech conference of the year featuring industry leaders, cutting-edge innovation..." }) => (
   <div className="w-full sm:w-1/3 p-2 flex-shrink-0">
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-100 hover:border-[#6C5CE7] transition-all hover:shadow-xl">
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-orange-50 hover:border-[#FF6B35] transition-all hover:shadow-xl">
       
       {/* Top Visual Area (Matches the design: light background, category tag, emoji) */}
       <div className="relative pt-[65%] bg-gradient-to-br from-orange-50 to-teal-50 border-b border-gray-100"> 
@@ -44,7 +44,17 @@ const EventCard = ({ category = "Technology", title = "Event Title", venueDate =
 
         {/* Centered Emoji Placeholder (You'll need an image for the specific confetti emoji) */}
         <div className="absolute inset-0 flex items-center justify-center">
-           <span className="text-5xl">🎉</span> 
+           {image ? (
+            <img
+              src={image}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              <PartyPopper className="w-12 h-12" />
+            </div>
+          )}
         </div>
       </div>
       
@@ -245,7 +255,7 @@ export default function EventOrganiserDashboard() {
               <QuickActionButton 
                 title="View Events" 
                 iconPath="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                onClick={() => router.push('/p-events')}
+                onClick={() => router.push('/eo-manageEvents')}
               />
               {/* Create Event: Plus Icon */}
               <QuickActionButton 

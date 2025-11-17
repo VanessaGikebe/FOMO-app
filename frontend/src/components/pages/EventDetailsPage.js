@@ -214,7 +214,7 @@ export default function EventDetailsPage({
 
             {/* Info */}
             <div>
-              <span className="bg-black text-white px-4 py-1 rounded-full text-sm font-medium">
+              <span className="bg-[#FF6B35] text-white px-4 py-1 rounded-full text-sm font-medium">
                 {event.category}
               </span>
 
@@ -470,7 +470,6 @@ export default function EventDetailsPage({
           </div>
         </section>
       )}
-      <Footer />
     </div>
   );
 }

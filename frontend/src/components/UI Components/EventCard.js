@@ -102,7 +102,7 @@ export default function EventCard({
 
   return (
     <Link href={getEventLink()}>
-      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden border-2 border-purple-100 hover:border-[#6C5CE7] cursor-pointer hover:scale-[1.02] duration-200">
+      <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden border-2 border-orange-50 hover:border-[#FF6B35] cursor-pointer hover:scale-[1.02] duration-200">
         {/* Event Image */}
         <div className="relative h-48 bg-gradient-to-br from-orange-50 to-purple-50">
           {image ? (
@@ -137,7 +137,7 @@ export default function EventCard({
           {/* Badges */}
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             {category && (
-              <span className="bg-gradient-to-r from-[#6C5CE7] to-[#5B4BCF] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+              <span className="bg-[#FF6B35] text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
                 {category}
               </span>
             )}

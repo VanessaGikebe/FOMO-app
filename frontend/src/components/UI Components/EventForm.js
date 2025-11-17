@@ -347,7 +347,7 @@ export default function EventForm({
           {isEditing ? "Update Event" : "Create Event"}
         </Button>
         {onCancel && (
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="cancel" onClick={onCancel}>
             Cancel
           </Button>
         )}
