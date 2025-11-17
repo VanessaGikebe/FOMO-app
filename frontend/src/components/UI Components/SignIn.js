@@ -105,7 +105,7 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 flex items-center justify-center p-4 font-sans">
-      <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-purple-200 shadow-xl">
+      <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-[#FF6B35] shadow-xl">
         <div className="flex flex-col items-center mb-4">
             <div className="w-32 h-32 rounded-xl flex items-center justify-center">
                 <img src="/FOMO LOGO.png" alt="FOMO Logo" className="w-32 h-32 object-contain"/>
@@ -127,7 +127,7 @@ export default function SignIn() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
+              className={`${inputBaseClasses} bg-background border-2 border-[#FF6B35] text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -142,7 +142,7 @@ export default function SignIn() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
+              className={`${inputBaseClasses} bg-background border-2 border-[#FF6B35] text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -163,7 +163,7 @@ export default function SignIn() {
             type="button"
             onClick={handleGoogle}
             disabled={isLoading}
-            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`${buttonBaseClasses} w-full border-2 border-[#FF6B35] bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">
               <path

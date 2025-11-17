@@ -125,7 +125,7 @@ export default function SignUp() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-purple-50 to-teal-50 flex items-center justify-center p-4 font-sans">
       
       {/* Main form container: border-foreground (black) applied, rounded corners */}
-      <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-purple-200 shadow-xl">
+      <div className="w-full max-w-sm p-6 bg-white rounded-xl border-2 border-[#FF6B35] shadow-xl">
         
         {/* Centered Logo and FOMO text */}
         <div className="flex flex-col items-center mb-6">
@@ -153,7 +153,7 @@ export default function SignUp() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
+              className={`${inputBaseClasses} bg-background border-2 border-[#FF6B35] text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -169,7 +169,7 @@ export default function SignUp() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
+              className={`${inputBaseClasses} bg-background border-2 border-[#FF6B35] text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -184,7 +184,7 @@ export default function SignUp() {
               onChange={(e) => setLabel(e.target.value)}
               required
               // Custom styles applied: mt-1 for margin, bg-white, and consistent input styling
-              className="mt-1 h-10 w-full rounded-md border-2 border-purple-200 bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] focus:border-[#6C5CE7] transition-colors"
+              className="mt-1 h-10 w-full rounded-md border-2 border-[#FF6B35] bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] focus:border-[#6C5CE7] transition-colors"
             >
                 <option value="Experience Seeker">Experience Seeker</option>
                 <option value="Event Organiser">Event Organiser</option>
@@ -204,7 +204,7 @@ export default function SignUp() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
+              className={`${inputBaseClasses} bg-background border-2 border-[#FF6B35] text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
 
@@ -220,7 +220,7 @@ export default function SignUp() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className={`${inputBaseClasses} bg-background border-2 border-purple-200 text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
+              className={`${inputBaseClasses} bg-background border-2 border-[#FF6B35] text-foreground placeholder:text-muted-foreground focus:border-[#6C5CE7]`}
             />
           </div>
           
@@ -228,7 +228,7 @@ export default function SignUp() {
           <div className="text-left pt-2">
         <p className="text-muted-foreground text-sm font-medium">
           Already have an account?{" "}
-          <Link href="/signin" className="text-[#6C5CE7] hover:text-[#5B4BCF] hover:underline transition-colors">
+          <Link href="/signin" className="text-[#FF6B35] hover:text-[#5B4BCF] hover:underline transition-colors">
             Sign In
           </Link>
         </p>
@@ -269,7 +269,7 @@ export default function SignUp() {
             onClick={handleGoogleSignUp}
             disabled={isLoading}
             // Inlined base styles + outline variant styles
-            className={`${buttonBaseClasses} w-full border-2 border-purple-200 bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`${buttonBaseClasses} w-full border-2 border-[#FF6B35] bg-white text-foreground hover:bg-purple-50 hover:border-[#6C5CE7] transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {/* Google Logo SVG - Set to text-foreground (black) */}
             <svg className="w-5 h-5 mr-2 text-foreground" viewBox="0 0 24 24">

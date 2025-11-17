@@ -116,7 +116,6 @@ export default function OrderHistoryPage() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
