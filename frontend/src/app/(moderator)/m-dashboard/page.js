@@ -65,9 +65,9 @@ const EventCard = ({ category, title, date, time, description }) => (
 // Component for Quick Action Buttons
 const QuickActionButton = ({ title, Icon }) => (
   <button className="w-full sm:w-1/5 p-2 flex-shrink-0">
-    <div className="bg-gray-100 hover:bg-gray-200 rounded-lg shadow-sm p-4 flex flex-col items-center justify-center transition duration-150 ease-in-out h-32">
-      <div className="bg-gray-300 rounded-full p-2 mb-2">
-        <Icon className="w-6 h-6 text-gray-800" />
+    <div className="bg-white hover:bg-gradient-to-br hover:from-orange-50 hover:to-purple-50 rounded-lg shadow-lg p-4 flex flex-col items-center justify-center transition-all duration-200 h-32 border-2 border-purple-100 hover:border-[#FF6B35] hover:scale-105">
+      <div className="bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-full p-2 mb-2">
+        <Icon className="w-6 h-6 text-white" />
       </div>
       <span className="text-sm font-medium text-gray-900">{title}</span>
     </div>

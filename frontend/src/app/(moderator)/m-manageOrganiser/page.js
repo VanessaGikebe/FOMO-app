@@ -42,7 +42,7 @@ const OrganiserRow = ({ id, name, email, router }) => {
           View Events
         </button>
         {/* Flag User Button (Red) */}
-        <button className="flex-1 md:flex-none bg-red-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150 ease-in-out font-semibold">
+        <button className="flex-1 md:flex-none bg-[#FF6B35] text-white text-sm py-2 px-4 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out font-semibold">
           Flag User
         </button>
       </div>
@@ -169,7 +169,7 @@ export default function ManageOrganisers() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Set a small page limit for testing the pagination interface
-  const ITEMS_PER_PAGE = 3;
+  const ITEMS_PER_PAGE = 5;
 
   // --- Dummy Data (Enough for two pages) ---
   const allOrganisers = useMemo(
@@ -295,8 +295,6 @@ export default function ManageOrganisers() {
           />
         </div>
       </main>
-
-      {/* --- Mock Footer Component --- */}
     </div>
   );
 }
