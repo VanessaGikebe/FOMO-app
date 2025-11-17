@@ -1,24 +1,14 @@
-'use client';
+"use client";
 
-// MOCK useRouter: Replacing import { useRouter } from "next/navigation"
-const useRouter = () => ({
-    push: (path) => console.log(`Navigating to: ${path}`),
-    // Add other necessary router methods if needed
-});
-// MOCK Footer: Replacing import { Footer } from "@/components"
-const Footer = () => (
-    <footer className="bg-gray-800 text-white p-4 mt-12 text-center text-sm">
-        <p>&copy; 2024 Event Moderation Panel</p>
-    </footer>
-);
-
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { getEventsByOrganizer } from "@/lib/api";
+import { Footer } from "@/components";
 
 // Component for an individual Event Card with updated styling and data
-const EventCard = ({ title, description, date, time, venue, attendees, price, category }) => (
-  <div className="w-full sm:w-1/2 lg:w-1/3 p-4 flex-shrink-0">
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-full flex flex-col hover:shadow-xl transition duration-300">
+const EventCard = ({ id, title, description, date, time, venue, attendees, price, category, onClick }) => (
+    <button onClick={() => onClick && onClick(id)} className="w-full sm:w-1/2 lg:w-1/3 p-4 flex-shrink-0">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-full flex flex-col hover:shadow-xl transition duration-300 text-left">
       
       {/* Top Section (Image Placeholder and Category Tag) */}
       <div className="relative bg-gray-50 aspect-video flex items-center justify-center p-6 border-b border-gray-100">
@@ -62,18 +52,18 @@ const EventCard = ({ title, description, date, time, venue, attendees, price, ca
         </div>
       </div>
       
-      {/* Footer Actions (Price and Flag Button) */}
-      <div className="flex justify-between items-center p-5 border-t border-gray-100 bg-gray-50">
-          <span className="text-lg font-extrabold text-gray-900">{price}</span>
+            {/* Footer Actions (Price and Flag Button) */}
+            <div className="flex justify-between items-center p-5 border-t border-gray-100 bg-gray-50">
+                    <span className="text-lg font-extrabold text-gray-900">{price}</span>
           
-          {/* Flag Button (Orange) */}
-          <button className="bg-orange-500 text-white text-sm py-2 px-4 rounded-lg hover:bg-orange-600 transition duration-150 ease-in-out font-semibold shadow-md flex items-center">
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-11l-3 3"></path></svg>
-            Flag
-          </button>
-      </div>
-    </div>
-  </div>
+                    {/* Flag Button (Orange) */}
+                    <button type="button" className="bg-orange-500 text-white text-sm py-2 px-4 rounded-lg hover:bg-orange-600 transition duration-150 ease-in-out font-semibold shadow-md flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-11l-3 3"></path></svg>
+                        Flag
+                    </button>
+            </div>
+        </div>
+    </button>
 );
 
 
@@ -164,80 +154,78 @@ const Pagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => 
 // --- Main Organiser Events Component ---
 
 export default function OrganiserEvents() {
+    const router = useRouter();
+    const params = useParams();
+    const organiserId = params?.id || null;
+
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 9; 
-    // This ORGANISER_NAME should ideally be loaded from the URL params, 
-    // but is mocked here for simplicity in a single-file environment.
-    const ORGANISER_NAME = "Global Tech Co."; 
+    const ITEMS_PER_PAGE = 9;
+    const [allEvents, setAllEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [organiserName, setOrganiserName] = useState(organiserId || 'Organiser');
 
-    // --- Enriched Mock Data ---
-    const eventData = [
-        { title: "Tech Summit 2025", category: "Technology", date: "2025-11-01", time: "09:00 AM", venue: "Nairobi Convention Centre", attendees: 342, price: "KES 2500", description: "Join us for the biggest tech conference of the year featuring industry leaders, cutting-edge innovation and networking opportunities." },
-        { title: "Jazz Night Live", category: "Music", date: "2025-11-02", time: "07:00 PM", venue: "The Alchemist Bar", attendees: 89, price: "KES 1500", description: "An evening of smooth jazz featuring local and international artists. Enjoy great music, food, and drinks in a cozy atmosphere." },
-        { title: "Food Festival Nairobi", category: "Food & Drink", date: "2025-12-01", time: "11:00 AM", venue: "Uhuru Gardens", attendees: 567, price: "KES 500", description: "Celebrate culinary diversity with over 50 food vendors, cooking demonstrations, and live music. Perfect for food lovers." },
-        { title: "AI Workshop Series", category: "Technology", date: "2025-11-15", time: "02:00 PM", venue: "KICC Auditorium", attendees: 120, price: "KES 3500", description: "A deep dive into the latest trends in Artificial Intelligence, machine learning, and neural networks. Limited seating available." },
-        { title: "Hip-Hop Dance Battle", category: "Entertainment", date: "2025-12-10", time: "06:30 PM", venue: "National Theatre", attendees: 215, price: "KES 1000", description: "Watch the city's best dance crews compete for the grand prize. High-energy performances and guest DJs." },
-        { title: "Craft Beer Tasting", category: "Food & Drink", date: "2025-11-20", time: "05:00 PM", venue: "Local Brewery", attendees: 65, price: "KES 2000", description: "Sample the newest craft beers from local brewers. Includes snacks and a talk on the brewing process." },
-        { title: "Startup Pitch Event", category: "Business", date: "2026-01-05", time: "11:00 AM", venue: "Venture Hub", attendees: 95, price: "KES 0 (Free)", description: "Witness the next generation of startups pitch their ideas to a panel of investors. Networking reception to follow." },
-        { title: "Classical Music Concert", category: "Music", date: "2026-01-25", time: "08:00 PM", venue: "Symphony Hall", attendees: 410, price: "KES 4000", description: "An evening dedicated to the timeless works of Mozart and Beethoven, performed by the Nairobi Philharmonic Orchestra." },
-        { title: "Sustainable Living Expo", category: "Lifestyle", date: "2026-02-14", time: "10:00 AM", venue: "Green Park", attendees: 180, price: "KES 800", description: "Explore eco-friendly products, workshops, and sustainable solutions for modern living. Bring your own reusable bag!" },
-        { title: "Digital Marketing Masterclass", category: "Business", date: "2026-02-28", time: "09:00 AM", venue: "Online Webinar", attendees: 75, price: "KES 5000", description: "Learn advanced digital marketing strategies from industry experts to boost your online presence and sales." },
-        { title: "Children's Book Fair", category: "Family", date: "2026-03-10", time: "10:00 AM", venue: "City Library", attendees: 250, price: "KES 200", description: "A day filled with storytelling, author signings, and fun activities for kids of all ages." },
-        { title: "Yoga Retreat Day", category: "Wellness", date: "2026-03-20", time: "07:00 AM", venue: "Hillside Resort", attendees: 45, price: "KES 6000", description: "A full day of mindfulness, meditation, and guided yoga sessions in a peaceful, natural environment." },
-    ];
+    useEffect(() => {
+        let mounted = true;
+        async function loadEvents() {
+            if (!organiserId) return;
+            setLoading(true);
+            const events = await getEventsByOrganizer(organiserId);
+            if (!mounted) return;
+            if (events && !events.error) {
+                setAllEvents(events);
+                // try to set organiser name from events payload if available
+                if (events.length > 0 && (events[0].organizerName || events[0].organizer)) {
+                    setOrganiserName(events[0].organizerName || events[0].organizer);
+                }
+            } else {
+                setAllEvents([]);
+            }
+            setLoading(false);
+        }
+        loadEvents();
+        return () => { mounted = false; };
+    }, [organiserId]);
 
-
-    const allEvents = eventData; 
-    // const allEvents = []; // Uncomment this line to test the "Empty State"
-
-    // Calculate current items to display
     const currentEvents = useMemo(() => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         const endIndex = startIndex + ITEMS_PER_PAGE;
         return allEvents.slice(startIndex, endIndex);
-    }, [allEvents, currentPage, ITEMS_PER_PAGE]);
+    }, [allEvents, currentPage]);
 
     const handlePageChange = (page) => {
-        // Ensure page stays within bounds
         const totalPages = Math.ceil(allEvents.length / ITEMS_PER_PAGE);
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-        }
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    };
+
+    const handleEventClick = (eventId) => {
+        if (!eventId) return;
+        router.push(`/m-event_detail/${encodeURIComponent(eventId)}`);
     };
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
-            
-            {/* --- Main Header Area (UPDATED) --- */}
             <header className="bg-white shadow-md">
                 <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-3xl font-extrabold text-gray-900">{ORGANISER_NAME}</h1>
-                    {/* The line below was updated to use the ORGANISER_NAME variable */}
-                    <p className="text-gray-600 mt-1">Events by {ORGANISER_NAME}</p>
+                    <h1 className="text-3xl font-extrabold text-gray-900">{organiserName}</h1>
+                    <p className="text-gray-600 mt-1">Events by {organiserName}</p>
                 </div>
             </header>
 
-            {/* --- Main Event Grid Content --- */}
             <main className="py-12 px-4 sm:px-6 lg:px-8 flex-grow">
                 <div className="max-w-7xl mx-auto">
-                    
-                    {/* Empty State */}
-                    {allEvents.length === 0 ? (
+                    {loading ? (
+                        <div className="text-center py-20">Loading events…</div>
+                    ) : allEvents.length === 0 ? (
                         <div className="text-center py-20 bg-white rounded-xl shadow-lg border border-gray-200">
-                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 13h6m-3-3v6m-9 1v10a2 2 0 002 2h10a2 2 0 002-2v-10a2 2 0 00-2-2H4a2 2 0 00-2 2z"></path>
-                            </svg>
                             <h3 className="mt-2 text-sm font-medium text-gray-900">No events found for this organiser</h3>
-                            <p className="mt-1 text-sm text-gray-500">
-                                This organiser has not published any events, or their events have been archived.
-                            </p>
+                            <p className="mt-1 text-sm text-gray-500">This organiser has not published any events, or their events have been archived.</p>
                         </div>
                     ) : (
-                        // Event Grid
                         <div className="flex flex-wrap -m-4 justify-start">
-                            {currentEvents.map((event, index) => (
-                                <EventCard 
-                                    key={index}
+                            {currentEvents.map((event) => (
+                                <EventCard
+                                    key={event.event_id || event.id || event._id}
+                                    id={event.event_id || event.id || event._id}
                                     title={event.title}
                                     description={event.description}
                                     date={event.date}
@@ -246,23 +234,21 @@ export default function OrganiserEvents() {
                                     attendees={event.attendees}
                                     price={event.price}
                                     category={event.category}
+                                    onClick={handleEventClick}
                                 />
                             ))}
                         </div>
                     )}
-                    
-                    {/* Pagination */}
+
                     <Pagination
                         totalItems={allEvents.length}
                         itemsPerPage={ITEMS_PER_PAGE}
                         currentPage={currentPage}
                         onPageChange={handlePageChange}
                     />
-
                 </div>
             </main>
 
-            {/* --- Footer Component --- */}
             <Footer />
         </div>
     );

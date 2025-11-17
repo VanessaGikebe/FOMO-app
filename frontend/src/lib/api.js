@@ -229,6 +229,32 @@ export async function getEventsByOrganizer(organizerId) {
 }
 
 /**
+ * Get all organisers (users with organizer role) from backend
+ * @returns {Promise<Array>} - Array of organiser user objects
+ */
+export async function getOrganisers() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/moderator/organisers`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => response.statusText);
+      const msg = `Failed to fetch organisers: ${response.status} ${text}`;
+      console.error('getOrganisers HTTP error:', msg);
+      return { error: msg };
+    }
+
+    return await response.json();
+  } catch (err) {
+    // Network-level errors (DNS, connection refused, CORS causing network failure)
+    console.error('getOrganisers network error:', err);
+    return { error: err && err.message ? err.message : String(err) };
+  }
+}
+
+/**
  * Create a new event
  * @param {Object} eventData - Event details
  * @param {string} authToken - Firebase auth token (optional)

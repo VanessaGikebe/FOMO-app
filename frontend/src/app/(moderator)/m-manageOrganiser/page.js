@@ -1,21 +1,17 @@
 "use client";
 
 import { Footer } from "@/components";
-
-// MOCK useRouter: Replacing import { useRouter } from "next/navigation"
-const useRouter = () => ({
-  push: (path) => console.log(`Navigating to: ${path}`),
-  // Add other necessary router methods if needed
-});
-import React, { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useMemo } from "react";
+import { getOrganisers } from "@/lib/api";
 
 // --- Organiser Row Component ---
-// Added 'id' and 'router' props
-const OrganiserRow = ({ id, name, email, router }) => {
+// Added 'id' and 'onView' props
+const OrganiserRow = ({ id, name, email, onView }) => {
   // Handler for navigating to the organiser's event list
   const handleViewEvents = () => {
-    // Navigates to the dynamic route for the specific organiser
-    router.push(`/m-view_organiserEvent/${id}`);
+    // Invoke the parent handler with the organiser ID
+    if (onView) onView(id);
   };
 
   return (
@@ -59,9 +55,6 @@ const Pagination = ({
 }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const maxPagesToShow = 10;
-
-  if (totalPages <= 1) return null;
-
   let startPage, endPage;
   if (totalPages <= maxPagesToShow) {
     startPage = 1;
@@ -169,34 +162,46 @@ export default function ManageOrganisers() {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Set a small page limit for testing the pagination interface
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 3;
 
-  // --- Dummy Data (Enough for two pages) ---
-  const allOrganisers = useMemo(
-    () => [
-      { id: "global-tech", name: "Global Tech Co.", email: "tech@global.com" },
-      { id: "art-space", name: "City Art Space", email: "art@city.org" },
-      {
-        id: "food-trucks",
-        name: "Gourmet Food Trucks",
-        email: "gourmet@trucks.net",
-      },
-      {
-        id: "fitness-pro",
-        name: "Fitness Pros Inc.",
-        email: "admin@fitness.com",
-      },
-      { id: "local-band", name: "The Local Band", email: "band@music.live" },
-      {
-        id: "health-plus",
-        name: "Health Plus Clinic",
-        email: "clinic@health.net",
-      },
-      // { id: "test-user", name: "Another Organizer", email: "test@org.com" }, // Uncomment for a third page
-    ],
-    []
-  );
-  // const allOrganisers = []; // Uncomment this line to test the "Empty State"
+  // Organisers state (loaded from backend)
+  const [allOrganisers, setAllOrganisers] = useState([]);
+
+  // Fetch organisers from backend on mount
+  useEffect(() => {
+    let mounted = true;
+    async function loadOrganisers() {
+      try {
+        const data = await getOrganisers();
+        if (!mounted) return;
+        if (!data) {
+          console.warn('getOrganisers returned no data');
+          setAllOrganisers([]);
+          return;
+        }
+        if (data.error) {
+          console.error('getOrganisers error:', data.error);
+          setAllOrganisers([]);
+          return;
+        }
+
+        const normalized = (data || []).map((u) => ({
+          id: u.id,
+          name: u.fullName || u.name || u.displayName || u.orgName || "",
+          email: u.email || u.emailAddress || u.email_address || "",
+        }));
+        setAllOrganisers(normalized);
+      } catch (err) {
+        console.error('Failed to load organisers:', err);
+        if (!mounted) return;
+        setAllOrganisers([]);
+      }
+    }
+    loadOrganisers();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Calculate current items to display
   const currentOrganisers = useMemo(() => {
@@ -211,6 +216,10 @@ export default function ManageOrganisers() {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
+  };
+
+  const handleViewOrganiser = (organiserId) => {
+    router.push(`/m-view_organiserEvent/${encodeURIComponent(organiserId)}`);
   };
 
   return (
@@ -280,7 +289,7 @@ export default function ManageOrganisers() {
                   id={organiser.id} // Pass the ID
                   name={organiser.name}
                   email={organiser.email}
-                  router={router} // Pass the router instance
+                  onView={handleViewOrganiser}
                 />
               ))}
             </div>
