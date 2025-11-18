@@ -42,7 +42,11 @@ const OrganiserRow = ({ id, name, email, isFlagged = false, flagReason = '', onV
           {isFlagged ? (
           <div className="flex items-center space-x-2">
             <span className="text-sm font-semibold text-red-600 bg-red-50 px-3 py-2 rounded-lg">Flagged</span>
-            {flagReason ? <span className="text-sm text-gray-500">{flagReason}</span> : null}
+            {flagReason ? (
+              <div className="mt-1 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                {flagReason}
+              </div>
+            ) : null}
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => onUnflag && onUnflag(id)}

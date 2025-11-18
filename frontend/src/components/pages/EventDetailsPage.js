@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/contexts/UserContext";
 import { useEvents } from "@/contexts/EventsContext";
@@ -38,6 +38,19 @@ export default function EventDetailsPage({
   const [showMessageBox, setShowMessageBox] = useState(false);
 
   const event = eventData;
+
+  // Auto-open flag input when ?openFlag=true is present in the URL (moderator flows)
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    try {
+      const shouldOpen = !!searchParams?.get?.("openFlag");
+      if (userType === "moderator" && shouldOpen) {
+        setShowFlagInput(true);
+      }
+    } catch (err) {
+      // ignore
+    }
+  }, [searchParams, userType]);
 
   if (!event) {
     return (
@@ -141,17 +154,18 @@ export default function EventDetailsPage({
 
       {/* Flag Warning */}
       {userType === "eventOrganiser" && isOwner && event.isFlagged && (
-        <div className="bg-red-50 border-b border-red-200">
+        <div className="bg-red-100 border-b border-red-300">
           <div className="max-w-6xl mx-auto px-6 py-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="text-red-600 w-6 h-6" />
+            <div className="flex items-start gap-4">
+              <AlertTriangle className="text-red-700 w-6 h-6 mt-1" />
               <div className="flex-1">
-                <p className="font-bold text-red-900 mb-1">
+                <p className="font-bold text-red-900 mb-1 text-lg">
                   Your event has been flagged
                 </p>
-                <p className="text-sm text-red-700 mb-3">
-                  Reason: {event.flagReason}
-                </p>
+                <div className="mb-3 p-3 bg-white border border-red-200 rounded-lg shadow-sm">
+                  <p className="text-sm font-semibold text-red-800">Reason</p>
+                  <p className="text-sm text-red-700">{event.flagReason || 'No reason provided'}</p>
+                </div>
                 <button
                   onClick={() => setShowMessageBox(!showMessageBox)}
                   className="text-sm bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
@@ -162,7 +176,7 @@ export default function EventDetailsPage({
             </div>
 
             {showMessageBox && (
-              <div className="mt-4 p-4 bg-white rounded-lg border border-red-200">
+              <div className="mt-4 p-4 bg-white rounded-lg border border-red-200 shadow-sm">
                 <label className="block text-sm font-medium text-gray-900 mb-2">
                   Message to Moderator:
                 </label>
@@ -170,12 +184,12 @@ export default function EventDetailsPage({
                   value={moderatorMessage}
                   onChange={(e) => setModeratorMessage(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-2 border rounded-lg"
+                  className="w-full px-4 py-2 border rounded-lg bg-white border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-300"
                 />
                 <div className="flex gap-2 mt-3">
                   <button
                     onClick={handleSendMessage}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md"
                   >
                     Send Message
                   </button>
@@ -184,7 +198,7 @@ export default function EventDetailsPage({
                       setShowMessageBox(false);
                       setModeratorMessage("");
                     }}
-                    className="bg-gray-300 px-4 py-2 rounded-lg"
+                    className="bg-gray-100 px-4 py-2 rounded-lg border border-gray-200"
                   >
                     Cancel
                   </button>
@@ -395,16 +409,19 @@ export default function EventDetailsPage({
       {userType === "moderator" && (
         <section className="py-8 px-6 bg-gray-50">
           <div className="max-w-6xl mx-auto">
-            <div className="bg-white rounded-xl p-6 border shadow-sm">
-              <h3 className="text-lg font-bold mb-4">Moderator Actions</h3>
+            <div className="bg-white rounded-xl p-6 border border-orange-200 shadow-lg ring-1 ring-orange-50">
+              <h3 className="text-lg font-bold mb-4 text-gray-900">Moderator Actions</h3>
 
               {event.isFlagged && (
-                <button
-                  onClick={() => {}}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
-                >
-                  Unflag
-                </button>
+                <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="text-red-700 w-5 h-5 mt-1" />
+                    <div>
+                      <p className="text-sm font-semibold text-red-900">Flag Reason</p>
+                      <p className="text-sm text-red-800">{event.flagReason || 'No reason provided'}</p>
+                    </div>
+                  </div>
+                </div>
               )}
 
               <div className="space-y-4">
@@ -419,19 +436,19 @@ export default function EventDetailsPage({
                       </button>
                     ) : (
                       <div className="space-y-3">
-                        <label className="text-sm font-medium">
-                          Reason for flagging:
+                        <label className="block text-sm font-semibold text-gray-900">
+                          Reason for flagging
                         </label>
                         <textarea
                           value={flagReason}
                           onChange={(e) => setFlagReason(e.target.value)}
                           rows={3}
-                          className="w-full px-4 py-2 border rounded-lg"
+                          className="w-full px-4 py-2 border rounded-lg bg-white border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] shadow-sm"
                         />
                         <div className="flex gap-2">
                           <button
                             onClick={handleFlag}
-                            className="flex-1 bg-orange-600 text-white py-2 rounded-lg"
+                            className="flex-1 bg-[#FF6B35] hover:bg-[#e55a2b] text-white py-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center"
                           >
                             Submit Flag
                           </button>
@@ -440,7 +457,7 @@ export default function EventDetailsPage({
                               setShowFlagInput(false);
                               setFlagReason("");
                             }}
-                            className="flex-1 bg-gray-300 py-2 rounded-lg"
+                            className="flex-1 bg-gray-100 hover:bg-gray-200 py-2 rounded-lg border border-gray-200 transition-colors"
                           >
                             Cancel
                           </button>

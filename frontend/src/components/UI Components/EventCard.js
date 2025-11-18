@@ -84,11 +84,8 @@ export default function EventCard({
   const handleFlagClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const reason = prompt(`Please provide a reason for flagging "${title}":`);
-    if (reason !== null && reason.trim() !== "") {
-      flagEvent(id, reason, currentUser?.uid);
-      alert(`Event "${title}" has been flagged successfully!`);
-    } else if (reason !== null) alert("Flag reason is required.");
+    // Navigate to the moderator event detail page which contains the flag form
+    router.push(`/m-event_detail/${encodeURIComponent(id)}?openFlag=true`);
   };
 
   const handleUnflagClick = (e) => {
@@ -199,11 +196,9 @@ export default function EventCard({
           {isFlagged &&
             event.flagReason &&
             (userType === "eventOrganiser" || userType === "moderator") && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-xs font-semibold text-red-900 mb-1">
-                  Flag Reason:
-                </p>
-                <p className="text-xs text-red-700">{event.flagReason}</p>
+              <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg shadow-sm">
+                <p className="text-sm font-semibold text-red-900 mb-1">Flag Reason:</p>
+                <p className="text-sm text-red-800">{event.flagReason}</p>
               </div>
             )}
 

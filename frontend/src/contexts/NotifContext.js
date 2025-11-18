@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useEvents } from "./EventsContext";
 import { useUser } from "./UserContext";
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebaseClient';
 
 const NotificationsContext = createContext();
 
@@ -112,6 +114,37 @@ export function NotificationsProvider({ children }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?.type, JSON.stringify(currentUser?.favorites || []), JSON.stringify((cartItems || []).map(ci => ci.eventId))]);
+
+  // Subscribe to server-side notifications for the current user (if present)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!currentUser || !currentUser.uid) return;
+
+    try {
+      const q = query(
+        collection(db, 'notifications'),
+        where('toUserId', '==', currentUser.uid),
+        orderBy('timestamp', 'desc')
+      );
+
+      const unsub = onSnapshot(q, (snapshot) => {
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        setNotifications(prev => {
+          // merge server notifications with existing ones, avoiding duplicates
+          const prevById = new Map(prev.map(n => [n.id, n]));
+          docs.forEach(n => prevById.set(n.id, n));
+          const merged = Array.from(prevById.values()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          return merged;
+        });
+      }, (err) => {
+        console.warn('Notifications subscription error:', err);
+      });
+
+      return () => unsub();
+    } catch (e) {
+      console.warn('Failed to subscribe to notifications:', e);
+    }
+  }, [currentUser?.uid]);
 
   // Add a notification programmatically
   const addNotification = (notification) => {

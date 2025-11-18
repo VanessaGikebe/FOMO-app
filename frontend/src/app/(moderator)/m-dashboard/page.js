@@ -164,26 +164,10 @@ export default function ModeratorDashboard() {
       return;
     }
     
-    const reason = prompt('Enter reason for flagging this event:');
-    if (!reason) return;
-    
-    try {
-  // Prefer the normalized event.id (Firestore document id) from our normalizer
-  // Fall back to alternate id shapes in the raw document only if event.id is missing
-  const canonicalId = event?.id || event?._raw?.event_id || event?._raw?.eventId || event?._raw?.id;
-      const success = await flagEvent(canonicalId, reason, currentUser.uid);
-      if (success) {
-        alert(`Event "${event.title}" has been flagged successfully!`);
-        // Reload flagged events
-        const flaggedData = await getFlaggedEventsAPI();
-        if (!flaggedData.error) {
-          setFlaggedEvents(Array.isArray(flaggedData) ? flaggedData : []);
-        }
-      }
-    } catch (err) {
-      console.error('Failed to flag event:', err);
-      alert('Failed to flag event. Please try again.');
-    }
+    // Redirect to the moderator event detail page which contains the flag form
+    // Use the canonical id (prefer normalized id but fall back to raw shapes)
+    const canonicalId = event?.id || event?._raw?.event_id || event?._raw?.eventId || event?._raw?.id;
+    router.push(`/m-event_detail/${encodeURIComponent(canonicalId)}?openFlag=true`);
   };
 
   // Quick action: view first flagged event (or notify if none)
@@ -225,23 +209,9 @@ export default function ModeratorDashboard() {
       return;
     }
 
-    const reason = prompt(`Enter reason for flagging "${candidate.title}":`);
-    if (!reason) return;
-
-    try {
-      const canonicalId = candidate.id || candidate._raw?.event_id || candidate._raw?.eventId || candidate._raw?.id;
-      const success = await flagEvent(canonicalId, reason, currentUser.uid);
-      if (success) {
-        alert('Event flagged successfully');
-        const flaggedData = await getFlaggedEventsAPI();
-        if (!flaggedData.error) setFlaggedEvents(Array.isArray(flaggedData) ? flaggedData : []);
-      } else {
-        alert('Flag action did not complete — check console for details');
-      }
-    } catch (err) {
-      console.error('Quick flag failed:', err);
-      alert('Failed to flag event');
-    }
+    // Redirect to the moderator event detail page for the matching candidate and open the flag form
+    const canonicalId = candidate.id || candidate._raw?.event_id || candidate._raw?.eventId || candidate._raw?.id;
+    router.push(`/m-event_detail/${encodeURIComponent(canonicalId)}?openFlag=true`);
   };
 
   if (!currentUser) {
