@@ -57,6 +57,9 @@ export class TicketsService {
         userId: dto.userId || 'guest',
         items: dto.cartItems,
         status: 'reserved',
+        customerEmail: dto.customerEmail,
+        customerName: dto.customerName,
+        customerPhone: dto.customerPhone,
         createdAt: admin.firestore.Timestamp.now(),
         updatedAt: admin.firestore.Timestamp.now(),
       };

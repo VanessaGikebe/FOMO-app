@@ -13,15 +13,17 @@ export default function SearchBar({
   const [selectedLocation, setSelectedLocation] = useState("all");
 
   const categories = [
-    "all",
-    "Music",
-    "Sports",
-    "Arts & Culture",
-    "Food & Drink",
-    "Technology",
-    "Business",
-    "Health & Wellness",
-    "Education",
+    { value: "all", label: "All Categories" },
+    { value: "cat_music", label: "Music" },
+    { value: "cat_sports", label: "Sports" },
+    { value: "cat_art", label: "Art & Culture" },
+    { value: "cat_food", label: "Food & Drink" },
+    { value: "cat_tech", label: "Technology" },
+    { value: "cat_business", label: "Business" },
+    { value: "cat_fitness", label: "Fitness & Wellness" },
+    { value: "cat_education", label: "Education" },
+    { value: "cat_workshop", label: "Workshop" },
+    { value: "cat_conference", label: "Conference" },
   ];
 
   const handleSearch = (e) => {
@@ -114,8 +116,8 @@ export default function SearchBar({
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             >
               {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat === "all" ? "All Categories" : cat}
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
                 </option>
               ))}
             </select>
