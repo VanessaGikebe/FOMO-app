@@ -197,6 +197,10 @@ export default function ManageOrganisers() {
 
   // Organisers state (loaded from backend)
   const [allOrganisers, setAllOrganisers] = useState([]);
+  // Modal state for flagging/removing users (replaces prompt())
+  const [flagModalOpenId, setFlagModalOpenId] = useState(null);
+  const [removeModalOpenId, setRemoveModalOpenId] = useState(null);
+  const [modalReason, setModalReason] = useState('');
 
   // Fetch organisers from backend on mount
   useEffect(() => {
@@ -276,33 +280,9 @@ export default function ManageOrganisers() {
       alert('Please sign in as a moderator');
       return;
     }
-
-    const reason = prompt('Enter reason for flagging this user:');
-    if (!reason) return;
-
-    try {
-      const result = await flagUserAPI(organiserId, reason, currentUser.uid);
-      if (result && result.error) {
-        alert('Failed to flag user: ' + result.error);
-        return;
-      }
-      alert('User flagged successfully');
-      // Refresh organisers list
-      const data = await getOrganisers();
-      if (data && !data.error) {
-        const normalized = (data || []).map((u) => ({
-          id: u.id,
-          name: u.fullName || u.name || u.displayName || u.orgName || "",
-          email: u.email || u.emailAddress || u.email_address || "",
-          isFlagged: u.isFlagged ?? false,
-          flagReason: u.flagReason || '',
-        }));
-        setAllOrganisers(normalized);
-      }
-    } catch (err) {
-      console.error('Failed to flag user:', err);
-      alert('Failed to flag user. See console for details.');
-    }
+    // Open inline modal to collect a reason (non-blocking)
+    setFlagModalOpenId(organiserId);
+    setModalReason('');
   };
 
   const handleUnflagUser = async (organiserId) => {
@@ -343,12 +323,49 @@ export default function ManageOrganisers() {
       alert('Please sign in as a moderator');
       return;
     }
+    // Open inline modal to collect an optional reason and confirm removal
+    setRemoveModalOpenId(organiserId);
+    setModalReason('');
+  };
 
-    const reason = prompt('Enter reason for removing this user (optional):');
-    if (!confirm('Are you sure you want to remove this user? This action will archive and delete the user.')) return;
-
+  // Modal submission handlers
+  const submitFlagUser = async () => {
+    if (!currentUser || !flagModalOpenId) return;
     try {
-      const result = await removeUserAPI(organiserId, reason || '', currentUser.uid);
+      const result = await flagUserAPI(flagModalOpenId, modalReason || '', currentUser.uid);
+      if (result && result.error) {
+        alert('Failed to flag user: ' + result.error);
+        return;
+      }
+      alert('User flagged successfully');
+      // Refresh organisers list
+      const data = await getOrganisers();
+      if (data && !data.error) {
+        const normalized = (data || []).map((u) => ({
+          id: u.id,
+          name: u.fullName || u.name || u.displayName || u.orgName || "",
+          email: u.email || u.emailAddress || u.email_address || "",
+          isFlagged: u.isFlagged ?? false,
+          flagReason: u.flagReason || '',
+        }));
+        setAllOrganisers(normalized);
+      }
+    } catch (err) {
+      console.error('Failed to flag user:', err);
+      alert('Failed to flag user. See console for details.');
+    } finally {
+      setFlagModalOpenId(null);
+      setModalReason('');
+    }
+  };
+
+  const submitRemoveUser = async () => {
+    if (!currentUser || !removeModalOpenId) return;
+    // Ask for a final confirmation within the modal
+    const confirmed = window.confirm('Are you sure you want to remove this user? This action will archive and delete the user.');
+    if (!confirmed) return;
+    try {
+      const result = await removeUserAPI(removeModalOpenId, modalReason || '', currentUser.uid);
       if (result && result.error) {
         alert('Failed to remove user: ' + result.error);
         return;
@@ -369,6 +386,9 @@ export default function ManageOrganisers() {
     } catch (err) {
       console.error('Failed to remove user:', err);
       alert('Failed to remove user. See console for details.');
+    } finally {
+      setRemoveModalOpenId(null);
+      setModalReason('');
     }
   };
 
@@ -461,6 +481,51 @@ export default function ManageOrganisers() {
             onPageChange={handlePageChange}
           />
         </div>
+        {/* --- Inline Modal for Flag / Remove (replaces prompt()) --- */}
+        {(flagModalOpenId || removeModalOpenId) && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="w-full max-w-xl bg-white rounded-lg shadow-2xl p-6 mx-4 border border-gray-100">
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                {flagModalOpenId ? 'Flag User' : 'Remove User'}
+              </h3>
+              <p className="text-sm text-gray-700 mb-4">
+                {flagModalOpenId
+                  ? 'Please provide a reason for flagging this user. Moderators can be contacted for follow-up.'
+                  : 'Optional: provide a reason for removing this user. You will be asked to confirm before the action is performed.'}
+              </p>
+              <textarea
+                aria-label={flagModalOpenId ? 'Reason for flagging' : 'Reason for removal'}
+                value={modalReason}
+                onChange={(e) => setModalReason(e.target.value)}
+                placeholder={flagModalOpenId ? 'Reason for flagging (required)...' : 'Reason for removal (optional)...'}
+                className="w-full h-28 p-3 border border-gray-300 rounded-md mb-4 resize-none text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300"
+              />
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => { setFlagModalOpenId(null); setRemoveModalOpenId(null); setModalReason(''); }}
+                  className="px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 border border-gray-300"
+                >
+                  Cancel
+                </button>
+                {flagModalOpenId ? (
+                  <button
+                    onClick={submitFlagUser}
+                    className="px-4 py-2 bg-[#FF6B35] text-white font-semibold rounded-md hover:bg-red-600 shadow"
+                  >
+                    Submit Flag
+                  </button>
+                ) : (
+                  <button
+                    onClick={submitRemoveUser}
+                    className="px-4 py-2 bg-red-700 text-white font-semibold rounded-md hover:bg-red-800 shadow"
+                  >
+                    Confirm Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
