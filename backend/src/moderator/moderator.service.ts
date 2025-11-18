@@ -34,6 +34,25 @@ export class ModeratorService {
         flaggedAt: timestamp,
       });
 
+      // Notify the event organizer (if available)
+      try {
+        const eventDataForNotif = eventDoc.data() || {};
+        const organizerId = eventDataForNotif.organizerId || eventDataForNotif.organizer_id || eventDataForNotif.userId || null;
+        if (organizerId) {
+          await this.db.collection('notifications').add({
+            toUserId: organizerId,
+            type: 'event_flag',
+            title: `Your event was flagged`,
+            message: `Your event \"${eventDataForNotif.title || eventId}\" was flagged for: ${reason}`,
+            relatedEventId: eventId,
+            isRead: false,
+            timestamp,
+          });
+        }
+      } catch (e) {
+        this.logger.warn('Failed to create notification for organizer after flag:', e?.message || e);
+      }
+
       // Log the moderation action
       await this.db.collection('moderatorLogs').add({
         action: 'FLAG_EVENT',
@@ -84,6 +103,25 @@ export class ModeratorService {
         unflaggedBy: moderatorId,
         unflaggedAt: timestamp,
       });
+
+      // Notify the event organizer about unflagging
+      try {
+        const eventDataForNotif = eventData || {};
+        const organizerId = eventDataForNotif.organizerId || eventDataForNotif.organizer_id || eventDataForNotif.userId || null;
+        if (organizerId) {
+          await this.db.collection('notifications').add({
+            toUserId: organizerId,
+            type: 'event_unflag',
+            title: `Flag removed from your event`,
+            message: `A flag was removed from your event \"${eventDataForNotif.title || eventId}\" by a moderator.`,
+            relatedEventId: eventId,
+            isRead: false,
+            timestamp,
+          });
+        }
+      } catch (e) {
+        this.logger.warn('Failed to create notification for organizer after unflag:', e?.message || e);
+      }
 
       // Log the moderation action
       await this.db.collection('moderatorLogs').add({
@@ -136,6 +174,24 @@ export class ModeratorService {
 
       // Delete the event
       await this.db.collection('events').doc(eventId).delete();
+
+      // Notify the event organizer and moderators about deletion
+      try {
+        const organizerId = eventData.organizerId || eventData.organizer_id || eventData.userId || null;
+        const notifPayload = {
+          type: 'event_delete',
+          title: `Event deleted by moderation`,
+          message: `Your event \"${eventData.title || eventId}\" was deleted by a moderator.`,
+          relatedEventId: eventId,
+          isRead: false,
+          timestamp,
+        };
+        if (organizerId) {
+          await this.db.collection('notifications').add({ ...notifPayload, toUserId: organizerId });
+        }
+      } catch (e) {
+        this.logger.warn('Failed to create notification after event deletion:', e?.message || e);
+      }
 
       // Log the moderation action
       await this.db.collection('moderatorLogs').add({

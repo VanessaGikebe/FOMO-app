@@ -33,9 +33,10 @@ export async function testBackendConnection() {
  * Submit a ticket order to the backend
  * @param {Array} cartItems - Array of cart items with eventId, quantity, pricePerTicket, etc.
  * @param {string} userId - User ID (optional, defaults to "guest")
+ * @param {Object} customerInfo - Customer information (email, name, phone)
  * @returns {Promise<Object>} - Order result with status, orderId, and order details
  */
-export async function submitTicketOrder(cartItems, userId = "guest") {
+export async function submitTicketOrder(cartItems, userId = "guest", customerInfo = {}) {
   if (!cartItems || cartItems.length === 0) {
     throw new Error("Cart is empty");
   }
@@ -48,6 +49,9 @@ export async function submitTicketOrder(cartItems, userId = "guest") {
       quantity: item.quantity,
       pricePerTicket: item.pricePerTicket,
     })),
+    customerEmail: customerInfo.email,
+    customerName: customerInfo.name,
+    customerPhone: customerInfo.phone,
   };
 
   const response = await fetch(`${API_BASE_URL}/orders`, {
@@ -108,6 +112,56 @@ export async function getUserOrders(userId) {
   return orders;
 }
 
+/**
+ * Initiate M-Pesa payment (STK Push)
+ * @param {string} phoneNumber - Phone number (format: 254XXXXXXXXX or 07XXXXXXXX)
+ * @param {number} amount - Amount to pay
+ * @param {string} orderId - Order ID
+ * @returns {Promise<Object>} - Payment initiation result with checkoutRequestId
+ */
+export async function initiateMpesaPayment(phoneNumber, amount, orderId) {
+  const response = await fetch(`${API_BASE_URL}/mpesa/initiate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      phoneNumber,
+      amount,
+      orderId,
+      accountReference: "FOMO Tickets",
+      transactionDesc: `Payment for order ${orderId}`
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || `M-Pesa payment initiation failed: ${response.statusText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Check M-Pesa payment status
+ * @param {string} checkoutRequestId - Checkout request ID from STK Push
+ * @returns {Promise<Object>} - Payment status
+ */
+export async function getMpesaPaymentStatus(checkoutRequestId) {
+  const response = await fetch(`${API_BASE_URL}/mpesa/status/${checkoutRequestId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch payment status: ${response.statusText}`);
+  }
+
+  return await response.json();
+}
+
 // ============ USER MANAGEMENT ============
 
 /**
@@ -164,6 +218,34 @@ export async function getCurrentUser(authToken) {
   }
 
   return await response.json();
+}
+
+// ============ EVENTS API ============
+
+/**
+ * Get all approved events from the backend
+ * @returns {Promise<Array>} - Array of all approved events
+ */
+export async function getAllEvents() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/events`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to fetch events: ${response.statusText}`);
+      return [];
+    }
+
+    const events = await response.json();
+    return events;
+  } catch (error) {
+    console.error("Error fetching events from backend:", error);
+    return [];
+  }
 }
 
 // ============ ORGANIZER EVENT MANAGEMENT ============
