@@ -91,7 +91,25 @@ export function EventsProvider({ children }) {
       try {
         const fetchedEvents = await fetchAllEvents();
         console.log('✅ Fetched events from backend:', fetchedEvents);
-        const normalized = fetchedEvents.map(event => normalizeEvent(event.id, event));
+
+        // If backend returned no events, attempt a client-side Firestore fallback.
+        // This helps in dev when the backend is down or unreachable but Firestore
+        // still contains data. It's safe because it only runs in the browser.
+        let finalEvents = fetchedEvents || [];
+        if ((!Array.isArray(fetchedEvents) || fetchedEvents.length === 0) && typeof window !== 'undefined') {
+          try {
+            console.warn('Backend returned no events — attempting Firestore client fallback');
+            const snapshot = await getDocs(collection(db, 'events'));
+            if (!snapshot.empty) {
+              finalEvents = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+              console.log('✅ Loaded events from Firestore fallback:', finalEvents);
+            }
+          } catch (fsErr) {
+            console.error('Firestore fallback failed:', fsErr);
+          }
+        }
+
+        const normalized = finalEvents.map(event => normalizeEvent(event.id, event));
         console.log('✅ Normalized events:', normalized);
         setEvents(normalized);
       } catch (error) {

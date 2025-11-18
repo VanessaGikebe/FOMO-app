@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useEvents } from "@/contexts/EventsContext";
 import { useUser } from "@/contexts/UserContext";
+import { getEventsByOrganizer } from '@/lib/api';
 import Link from "next/link";
 import SearchBar from "../UI Components/SearchBar";
 import EventCard from "../UI Components/EventCard";
@@ -16,22 +17,52 @@ export default function EventsPage({ userType = "public" }) {
 
   useEffect(() => {
     // Get events based on user type
-    let fetchedEvents = getAllEvents(false);
-    
-    // For event organisers, filter to only show their own events
-    if (userType === "eventOrganiser" && currentUser?.uid) {
-      fetchedEvents = fetchedEvents.filter(
-        (event) => event.organizerId === currentUser.uid
-      );
-    }
-    
-    // Moderators see all events including flagged
-    if (userType === "moderator") {
-      fetchedEvents = getAllEvents(true);
-    }
-    
-    setAllEvents(fetchedEvents);
-    setFilteredEvents(fetchedEvents);
+    const load = async () => {
+      // Moderators see all events including flagged
+      if (userType === "moderator") {
+        const evs = getAllEvents(true);
+        setAllEvents(evs);
+        setFilteredEvents(evs);
+        return;
+      }
+
+      // Event organisers should fetch their events directly via API so they
+      // see drafts/unapproved events too (backend /events returns only
+      // approved/public events). This matches the dashboard behavior.
+      if (userType === "eventOrganiser") {
+        const uid = currentUser?.uid;
+        if (!uid) {
+          setAllEvents([]);
+          setFilteredEvents([]);
+          return;
+        }
+
+        try {
+          const evs = await getEventsByOrganizer(uid);
+          if (Array.isArray(evs)) {
+            setAllEvents(evs);
+            setFilteredEvents(evs);
+          } else {
+            console.warn('Failed to fetch organiser events:', evs?.error);
+            setAllEvents([]);
+            setFilteredEvents([]);
+          }
+        } catch (err) {
+          console.error('Error fetching organiser events:', err);
+          setAllEvents([]);
+          setFilteredEvents([]);
+        }
+
+        return;
+      }
+
+      // Default public view: show approved events from context
+      const fetchedEvents = getAllEvents(false);
+      setAllEvents(fetchedEvents);
+      setFilteredEvents(fetchedEvents);
+    };
+
+    load();
   }, [userType, currentUser, events]); // Added 'events' dependency to re-render when events change
 
   const handleSearch = ({ searchTerm, category, location }) => {
