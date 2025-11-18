@@ -164,10 +164,8 @@ export default function ModeratorDashboard() {
       return;
     }
     
-    // Redirect to the moderator event detail page which contains the flag form
-    // Use the canonical id (prefer normalized id but fall back to raw shapes)
-    const canonicalId = event?.id || event?._raw?.event_id || event?._raw?.eventId || event?._raw?.id;
-    router.push(`/m-event_detail/${encodeURIComponent(canonicalId)}?openFlag=true`);
+    // Redirect to the Manage Events page where moderator can select the event
+    router.push('/m-manageEvent');
   };
 
   // Quick action: view first flagged event (or notify if none)
@@ -187,31 +185,8 @@ export default function ModeratorDashboard() {
       alert('Please sign in as a moderator');
       return;
     }
-    // Ask for a title or substring instead of an opaque event ID — more intuitive
-    const query = prompt('Enter event title (or part of it) to flag:');
-    if (!query) return;
-
-    // Try to locate an event by exact id first, then by title substring (case-insensitive)
-    const trimmed = query.trim();
-    let candidate = events.find(ev => ev.id === trimmed);
-    if (!candidate) {
-      const lower = trimmed.toLowerCase();
-      candidate = events.find(ev => (ev.title || '').toLowerCase().includes(lower));
-    }
-
-    if (!candidate) {
-      alert(`No event found matching "${trimmed}". Use the event list to pick the correct item.`);
-      return;
-    }
-
-    if (candidate.isFlagged) {
-      alert(`Event "${candidate.title}" is already flagged.`);
-      return;
-    }
-
-    // Redirect to the moderator event detail page for the matching candidate and open the flag form
-    const canonicalId = candidate.id || candidate._raw?.event_id || candidate._raw?.eventId || candidate._raw?.id;
-    router.push(`/m-event_detail/${encodeURIComponent(canonicalId)}?openFlag=true`);
+    // Redirect to Manage Events so moderator can pick the event from the normal flow
+    router.push('/m-manageEvent');
   };
 
   if (!currentUser) {
