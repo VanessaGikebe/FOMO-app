@@ -1,0 +1,32 @@
+[debug] [2025-11-08T20:20:10.107Z] ----------------------------------------------------------------------
+[debug] [2025-11-08T20:20:10.115Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\sitat\AppData\Local\npm-cache\_npx\ba4f1959e38407b5\node_modules\firebase-tools\lib\bin\firebase.js init dataconnect --project demo-no-project
+[debug] [2025-11-08T20:20:10.116Z] CLI Version:   14.24.1
+[debug] [2025-11-08T20:20:10.116Z] Platform:      win32
+[debug] [2025-11-08T20:20:10.116Z] Node Version:  v22.13.0
+[debug] [2025-11-08T20:20:10.117Z] Time:          Sat Nov 08 2025 23:20:10 GMT+0300 (East Africa Time)
+[debug] [2025-11-08T20:20:10.117Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-08T20:20:10.122Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  E:\.vscode\FOMO
+
+[debug] [2025-11-08T20:20:10.946Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2025-11-08T20:20:10.946Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] 
+[info] Skipping Firebase project setup because a demo project is provided
+[info] 
+=== Dataconnect Setup
+[info] +  dataconnect: Detected existing apps . (admin_node), frontend (web), fomoproj (web), backend (admin_node) 

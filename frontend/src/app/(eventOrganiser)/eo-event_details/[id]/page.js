@@ -1,23 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useParams } from "next/navigation";
 import { useEvents } from "@/contexts/EventsContext";
 import { EventDetailsPage } from "@/components";
 import { getEventDetails } from "@/lib/api";
 
-export default function EventOrganiserEventDetailsPage() {
+function EventOrganiserEventDetailsContent() {
   const params = useParams();
   const { getEventById, events } = useEvents();
   const [currentEvent, setCurrentEvent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const eventId = params.id;
 
   useEffect(() => {
     const loadEvent = async () => {
       setIsLoading(true);
-      
+
       // First try to get from context
       const event = getEventById(eventId);
       if (event) {
@@ -54,10 +54,18 @@ export default function EventOrganiserEventDetailsPage() {
   }
 
   return (
-    <EventDetailsPage 
-      eventData={currentEvent} 
+    <EventDetailsPage
+      eventData={currentEvent}
       userType="eventOrganiser"
       eventId={eventId}
     />
+  );
+}
+
+export default function EventOrganiserEventDetailsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <EventOrganiserEventDetailsContent />
+    </Suspense>
   );
 }
