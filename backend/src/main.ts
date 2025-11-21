@@ -13,18 +13,24 @@ async function bootstrap() {
   // Keep this area clean; that module already tries env/path/local/ADC fallbacks.
 
   const app = await NestFactory.create(AppModule);
-  // Enable permissive CORS for local development to allow frontend dev server
-  // to call the API. This is intentionally permissive and should be
-  // restricted in production.
+
+  // CORS Configuration: Use specific origins in production, permissive in development
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+    : true; // reflect request origin in development
+
   app.enableCors({
-    origin: true, // reflect request origin
+    origin: corsOrigins,
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
- // await app.listen(3000);
-  await app.listen(3002, '0.0.0.0');
-  console.log(`Application is running on: http://0.0.0.0:3002`);
+
+  const port = process.env.PORT || 3002;
+  await app.listen(port);
+  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`CORS Origins: ${Array.isArray(corsOrigins) ? corsOrigins.join(', ') : 'all (development mode)'}`);
 }
 
 void bootstrap();

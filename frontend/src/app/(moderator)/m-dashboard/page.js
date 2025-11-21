@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -14,7 +15,7 @@ const MetricCard = ({ title, value, Icon, iconColor, valueColor }) => (
     <div className="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-4 border-2 border-orange-50 hover:border-[#FF6B35] transition-all">
       <div className="flex items-center space-x-3">
         <div
-          className={`flex-shrink-0 rounded-full p-2`}
+          className={`flex - shrink - 0 rounded - full p - 2`}
           style={{ backgroundColor: iconColor }}
         >
           <Icon className="w-5 h-5 text-white" />
@@ -22,7 +23,7 @@ const MetricCard = ({ title, value, Icon, iconColor, valueColor }) => (
         <p className="text-sm font-medium text-gray-700">{title}</p>
       </div>
       <div>
-        <p className={`text-4xl font-bold`} style={{ color: valueColor }}>
+        <p className={`text - 4xl font - bold`} style={{ color: valueColor }}>
           {value}
         </p>
       </div>
@@ -38,7 +39,7 @@ const EventCard = ({ event, onFlagClick }) => {
   const category = event.category || 'Other';
   const description = event.description || 'No description provided';
   const isFlagged = event.isFlagged || false;
-  
+
   return (
     <div className="w-full sm:w-1/3 p-2 flex-shrink-0">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-orange-50 hover:border-[#FF6B35] transition-all hover:shadow-xl">
@@ -63,7 +64,7 @@ const EventCard = ({ event, onFlagClick }) => {
             </div>
           </div>
           <div className="flex space-x-2 pt-4 border-t border-gray-100 mt-auto">
-            <button 
+            <button
               onClick={() => onFlagClick(event)}
               className={`flex-1 text-white text-sm py-2.5 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-semibold ${isFlagged ? 'bg-red-500' : 'bg-[#FF6B35]'}`}
             >
@@ -93,7 +94,7 @@ export default function ModeratorDashboard() {
   const router = useRouter();
   const { currentUser } = useUser();
   const { events, flagEvent } = useEvents();
-  
+
   const [flaggedEvents, setFlaggedEvents] = useState([]);
   const [moderationLogs, setModerationLogs] = useState([]);
   const [stats, setStats] = useState({ viewed: 0, denied: 0, validated: 0 });
@@ -103,7 +104,7 @@ export default function ModeratorDashboard() {
   // Fetch flagged events and moderation logs on component mount
   useEffect(() => {
     if (!currentUser) return;
-    
+
     const loadData = async () => {
       try {
         setLoading(true);
@@ -112,25 +113,25 @@ export default function ModeratorDashboard() {
         if (!flaggedData.error) {
           setFlaggedEvents(Array.isArray(flaggedData) ? flaggedData : []);
         }
-        
+
         // Fetch moderation logs to calculate stats
         const logsData = await getModerationLogsAPI();
         if (!logsData.error) {
           const logs = Array.isArray(logsData) ? logsData : [];
           setModerationLogs(logs);
-          
+
           // Calculate stats from logs
           const flagCount = logs.filter(log => log.action === 'FLAG_EVENT').length;
           const unflagCount = logs.filter(log => log.action === 'UNFLAG_EVENT').length;
           const deleteCount = logs.filter(log => log.action === 'DELETE_EVENT').length;
-          
+
           setStats({
             viewed: flagCount + unflagCount,
             denied: deleteCount,
             validated: logs.length
           });
         }
-        
+
         setError(null);
       } catch (err) {
         console.error('Failed to load moderator data:', err);
@@ -139,10 +140,10 @@ export default function ModeratorDashboard() {
         setLoading(false);
       }
     };
-    
+
     loadData();
 
-    return () => {};
+    return () => { };
   }, [currentUser]);
 
   // Keep flaggedEvents in sync with the real-time `events` from EventsContext.
@@ -158,12 +159,12 @@ export default function ModeratorDashboard() {
       alert('Please sign in as a moderator');
       return;
     }
-    
+
     if (event.isFlagged) {
       alert(`This event is already flagged: ${event.flagReason || 'No reason provided'}`);
       return;
     }
-    
+
     // Redirect to the Manage Events page where moderator can select the event
     router.push('/m-manageEvent');
   };
@@ -195,7 +196,7 @@ export default function ModeratorDashboard() {
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-6">Please sign in as a moderator to access this dashboard</p>
-          <button 
+          <button
             onClick={() => router.push('/signin')}
             className="bg-[#FF6B35] text-white px-6 py-3 rounded-lg hover:shadow-lg"
           >
@@ -248,7 +249,7 @@ export default function ModeratorDashboard() {
             <h2 className="text-2xl font-bold text-[#FF6B35] mb-1">
               Events to Moderate
             </h2>
-            
+
             <p className="text-gray-600 mb-6">
               Review and flag events for non-compliance
             </p>
@@ -297,3 +298,4 @@ export default function ModeratorDashboard() {
     </div>
   );
 }
+
