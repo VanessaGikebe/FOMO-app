@@ -54,13 +54,24 @@ export default function CreateEventPage() {
       
       if (response && response.id) {
         alert(`Event "${response.title || eventData.title}" created successfully!`);
-        router.push("/eo-dashboard");
+        // Redirect to the edit page for the newly created event so the organiser
+        // can immediately confirm details or update the image if needed.
+        router.push(`/eo-edit_event_page/${response.id}`);
       } else {
         setError(response?.error || 'Failed to create event');
       }
     } catch (err) {
       console.error('Failed to create event:', err);
-      setError(err.message || 'Failed to create event. Please try again.');
+
+      // Detect common permission error and show a friendlier, actionable message
+      const msg = (err && err.message) ? err.message.toString().toLowerCase() : '';
+      if (msg.includes('insufficient permissions') || msg.includes('forbidden') || msg.includes('403')) {
+        setError(
+          'You do not have permission to create events. Make sure your account has the "organizer" role in the users collection (Firestore) or ask an admin to grant you organizer privileges.'
+        );
+      } else {
+        setError(err.message || 'Failed to create event. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
